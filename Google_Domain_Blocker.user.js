@@ -185,7 +185,7 @@ function bldLink(sp) {
 function getDomain(h3) {
 	try {
 		var href = h3.getElementsByTagName('a')[0].getAttribute('href');
-			href = /https{0,1}:\/\/(.+?)\//.exec(href)[1];
+			href = /http:\/\/(.+?)\//.exec(href)[1];
 		return href;
 	} catch(er) {
 		return false;
