@@ -14,21 +14,11 @@ var console;
 function init() {
 	blacklist = getBlacklist();
 	blDIV = makeBLDIV();
-	// Firebug console
 	console = (unsafeWindow.console) ? unsafeWindow.console : '';
 	addStyle();
 	parseResults();
 	addLinks();
 	editList();
-	windowResize();
-	window.addEventListener('resize',windowResize,false);
-	window.addEventListener('scroll',windowResize,false);
-}
-
-function windowResize() {
-	var top = (window.pageYOffset+25);
-	var height = (window.innerHeight-75);
-	GM_addStyle('div.blDIV { height: '+ height +'px; top: '+ top +'px; }');
 }
 
 function editList() {
@@ -65,7 +55,7 @@ function toggleBlackList() {
 			var lix = ul.appendChild(li.cloneNode(true));
 			var nix = lix.appendChild(x.cloneNode(true));
 				nix.addEventListener('click',delDomain,false);
-				lix.appendChild(document.createTextNode('\u00a0'+ domain))
+				lix.appendChild(document.createTextNode(' '+ domain))
 		});
 		var lix = ul.appendChild(li.cloneNode(true));
 		var inp = lix.appendChild(document.createElement('input'));
@@ -165,9 +155,9 @@ function addStyle() {
 	GM_addStyle('span.blyesno   { color: maroon; font-size: 13px; text-decoration: none; cursor: pointer; }');
 	GM_addStyle('span.blackout  { color: #333333; width: 598px; padding: 2px; font-size: 10px;');
 	GM_addStyle('span.blShow    { color: #0000CC; text-decoration: underline; cursor: pointer; }');
-	GM_addStyle('div.blDIV      { background-color: white; padding: 5px; border: 1px solid black; z-index: 100; position: absolute; right: 5px; display: inline; min-width: 300px; top: 0px; overflow: auto; }');
+	GM_addStyle('div.blDIV      { background-color: white; padding: 5px; border: 1px solid black; z-index: 100; position: absolute; top: 25px; right: 5px; display: inline; }');
 	GM_addStyle('ul#blDIVul     { margin: 0; padding: 0; min-width: 200px; text-align: left; }');
-	GM_addStyle('ul#blDIVul li  { margin: 0; padding: 0; list-style: none; font-size: 12px; width: 250px; overflow: hidden; }');
+	GM_addStyle('ul#blDIVul li  { margin: 0; padding: 0; list-style: none; font-size: 12px; }');
 	GM_addStyle('div.noShow     { display: none; ');
 	GM_addStyle('span.blNix     { color: maroon; cursor: pointer; }');
 	GM_addStyle('input#blButton { border: 1px solid silver; font-size: 10px; width: 30px; }');
