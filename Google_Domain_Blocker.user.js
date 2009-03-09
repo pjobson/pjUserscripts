@@ -32,7 +32,7 @@ function windowResize() {
 }
 
 function editList() {
-	var gb = $('guser');
+	var gb = $('gb');
 		gb.appendChild(document.createTextNode(' | '));
 	var sp = gb.appendChild(document.createElement('span'));
 		sp.appendChild(document.createTextNode('Show Blacklist'));
