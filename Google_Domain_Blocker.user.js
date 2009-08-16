@@ -204,9 +204,8 @@ function getDomain(h3) {
 
 function blacklistDomain() {
 	var el = this;
-	while (el.tagName != 'LI') el = el.parentNode;
-	var href = getDomain(el.getElementsByTagName('h3')[0]);
-	showConfirm(this,href);
+	var href = getDomain(el.parentNode.parentNode.parentNode.getElementsByTagName('h3')[0]);
+	showConfirm(el,href);
 }
 
 function showConfirm(el,href) {
