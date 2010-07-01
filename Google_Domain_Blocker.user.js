@@ -9,10 +9,13 @@
 window.setTimeout(init,100);
 var blacklist;
 var blDIV;
+var console;
 
 function init() {
 	blacklist = getBlacklist();
 	blDIV = makeBLDIV();
+	// Firebug console
+	console = (unsafeWindow.console) ? unsafeWindow.console : '';
 	addStyle();
 	parseResults();
 	addLinks();
@@ -224,7 +227,7 @@ function showConfirm(el,href) {
 }
 
 function blConfirm(tf,el) {
-	if (tf==true) {
+	if (tf) {
 		addBlacklist(el.getAttribute('domain'));
 		parseResults();
 	} else {
