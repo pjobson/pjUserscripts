@@ -4,182 +4,243 @@
 // @description    Blocks irrelevant and spam domains.
 // @include        http://*.google.com/search*
 // @include        http://google.com/search*
-// @include        https://*.google.com/search*
-// @include        https://google.com/search*
-// @require        http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // ==/UserScript==
 
+window.setTimeout(init,100);
+var blacklist;
+var blDIV;
 
-var g = {
-	blacklist: [],
-	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
-	init: function() {
-		g.eventListeners();
-		g.addStyles();
-		g.blacklist = g.getBlacklist();
-		g.hideResults();
-		g.makeBlacklistControls();
-		g.addBlackListLinks();
-	},
-	eventListeners: function() {
-		// Event listeners for this script
-		$('span#showHideBlacklist').live('click',g.showHideBlacklist);
-		$('span.blLink').live('click',g.blacklistThisDomain);
-		$('span.blyes,span.blno').live('click',g.confirmation);
-		$('input#blAddBox').live('keyup',g.manualAdd);
-		$('input#blAddBtn').live('click',g.manualAdd);
-		$('span.ex').live('click',g.removeFromBlackList);
-	},
-	addStyles: function() {
-		// Adds styles to the DOM
-		GM_addStyle("li.hidtxt { color: gray; font-size: 0.75em; margin: 5px 0; }");
-		GM_addStyle("span.showBL { color: #0000CC; text-decoration: underline; cursor: pointer; }");
-		GM_addStyle("div#blTop { position: absolute; top: "+ parseInt($('div#cnt').position().top,10) +"px; right: 5px; border: 1px solid black; width: 240px; padding: 0; }");
-		GM_addStyle("ul#blacklist li { list-style: none; margin: 0; padding: 1px 0 1px 0; }");
-		GM_addStyle("span.ex { color: #DF0101; cursor: pointer; } ");
-		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
-		GM_addStyle("span.blConfirm { color: black; display: none; }");
-		GM_addStyle("span.blConfirm span { color: #DB4272; cursor: pointer; }");
-		GM_addStyle("div#blULContainer { height: 300px; overflow: auto; margin: 5px; }");
-		GM_addStyle("div#blForm { margin-top: 5px; padding: 5px; }");
-		GM_addStyle("li.hidtxt span.domain { font-style: italic; }");
-		GM_addStyle("div#blText { background-color: silver; color: black; padding: 3px; text-align: center; font-weight: bold; }");
-	},
-	saveBlacklist: function() {
-		// Saves g.blacklist to greasemonkey blacklist
-		GM_setValue('blacklist',g.blacklist.join(','));
-	},
-	addToBlackList: function(domain) {
-		// Adds an entry to the blacklist
-		g.blacklist.push(domain);
-		g.blacklist = g.blacklist.uniq().sort();
-		g.saveBlacklist();
-		// Show the results first, stop duplication errors.
-		g.showResults();
-		g.hideResults();
-		g.buildList();
-	},
-	removeFromBlackList: function() {
-		// Removes an entry from the blacklist
-		var domain = $(this).parent().find('span.domain').text();
-		g.blacklist = g.blacklist.remove(domain);
-		g.saveBlacklist();
-		// Show the results first, stop duplication errors.
-		g.showResults();
-		g.hideResults();
-		g.buildList();
-	},
-	manualAdd: function(ev) {
-		// manually add a domain to the blacklist
-		if ($('input#blAddBox').attr('value') == '') return;
-		
-		// I'm lazy, so I'm using the same function for keypress and a click
-		if(ev.keyCode != 13 && $(this).attr('id')== 'blAddBox') return;
+function init() {
+	blacklist = getBlacklist();
+	blDIV = makeBLDIV();
+	addStyle();
+	parseResults();
+	addLinks();
+	editList();
+	windowResize();
+	window.addEventListener('resize',windowResize,false);
+	window.addEventListener('scroll',windowResize,false);
+}
 
-		g.addToBlackList($('input#blAddBox').attr('value'));
-		$('input#blAddBox').attr('value','');
-	},
-	addBlackListLinks: function() {
-		// Adds blacklist & confirm links to each SERP
-		$('li.g span.f span.gl').each(function() {
-			$(this).append(' - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">yes</span> / <span class="blno">no</span></span>');
-		});
-	},
-	blacklistThisDomain: function() {
-		// Blacklist this domain, show the confirmation
-		$(this).hide();
-		$(this).parent().find('span.blConfirm').show();
-	},
-	confirmation: function() {
-		// Shows confirmation for adding a domain to the list
-		if ($(this).hasClass('blyes')) {
-			g.addToBlackList($(this).parents('span.f').find('cite').text().split('/')[0]);
-		} else {
-			$(this).parent().hide()
-			$(this).parent().prev().show();
-		}
-	},
-	getBlacklist: function() {
-		// Gets the blacklist from greasemonkey
-		return (GM_getValue('blacklist') ? GM_getValue('blacklist').split(',') : [] );
-	},
-	hideResults: function() {
-		// Hide the results using the blacklist.
-		$('li.g span.f cite').each(function() {
-			var domain = $(this).text().split('/')[0];
-			var cite = this;
-			var h = false;
-			$.each(g.blacklist,function(i,key) {
-				if (/^\/.+\/$/.test(key)) {
-					// Regular expression
-					var re = new RegExp(key.replace(/\//g,''),'i');
-					if (re.test(domain)) {
-						h = true;
-					}
-				} else if (key.toLowerCase() === domain.toLowerCase()) {
-					h = true;
-				}
-			});
-			if (h===true) {
-				$(cite).parents('li.g').before(g.hiddenText.replace(/xxx/,domain));
-				$(cite).parents('li.g').hide();
-			}
-		});
-	},
-	showResults: function() {
-		// Shows all results
-		$('li.hidtxt').remove();
-		$('li.g').show();
-	},
-	makeBlacklistControls: function() {
-		// Makes the controls for this script
-		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
+function windowResize() {
+	var top = (window.pageYOffset+25);
+	var height = (window.innerHeight-75);
+	GM_addStyle('div.blDIV { height: '+ height +'px; top: '+ top +'px; }');
+}
 
-		$('body').append('<div id="blTop"><div id="blText">Your Blacklist</div><div id="blULContainer"><ul id="blacklist"></ul></div><div id="blForm"></div></div>');
-		
-		$('div#blForm').append('<input type="text" id="blAddBox" /><input type="button" value="add" id="blAddBtn" />');
-		
-		$('div#blTop').hide();
-		
-		g.buildList();
-	},
-	buildList: function() {
-		$('li.domainEntry').remove();
-		$.each(g.blacklist,function(i,key) {
-			$('ul#blacklist').append('<li class="domainEntry"><span class="ex">\u2297</span> <span class="domain">'+ key +'</span></li>');
+function editList() {
+	var gb = $('guser');
+		gb.appendChild(document.createTextNode(' | '));
+	var sp = gb.appendChild(document.createElement('span'));
+		sp.appendChild(document.createTextNode('Show Blacklist'));
+		sp.setAttribute('class','blShow');
+		sp.addEventListener('click',toggleBlackList,false);
+}
+
+function makeBLDIV() {
+	var div = document.getElementsByTagName('body')[0].appendChild(document.createElement('div'));
+		div.setAttribute('class','noShow');
+	var ul = div.appendChild(document.createElement('ul'));
+		ul.setAttribute('id','blDIVul');
+	return div;
+}
+
+function toggleBlackList() {
+	var span = document.getElementsByClassName('blShow')[0];
+	if (blDIV.getAttribute('class') != 'noShow') {
+		span.childNodes[0].nodeValue = span.childNodes[0].nodeValue.replace(/Hide/,'Show');
+		blDIV.setAttribute('class','noShow');
+	} else {
+		span.childNodes[0].nodeValue = span.childNodes[0].nodeValue.replace(/Show/,'Hide');
+		var ul = $('blDIVul');
+		while (ul.childNodes.length>0) ul.removeChild(ul.childNodes[0]);
+		var li = document.createElement('li');
+		var x  = document.createElement('span');
+			x.setAttribute('class','blNix');
+			x.appendChild(document.createTextNode('\u2297'));
+		blacklist.forEach(function(domain) {
+			var lix = ul.appendChild(li.cloneNode(true));
+			var nix = lix.appendChild(x.cloneNode(true));
+				nix.addEventListener('click',delDomain,false);
+				lix.appendChild(document.createTextNode('\u00a0'+ domain))
 		});
-	},
-	showHideBlacklist: function() {
-		// Shows or hides the blacklist drop menu
-		if (/Show/.test($('span#showHideBlacklist').text())) {
-			// show the blacklist
-			$('span#showHideBlacklist').html('Hide Blacklist');
-			$('div#blTop').show();
-		} else {
-			// hide the blacklist
-			$('span#showHideBlacklist').html('Show Blacklist');
-			$('div#blTop').hide();
+		var lix = ul.appendChild(li.cloneNode(true));
+		var inp = lix.appendChild(document.createElement('input'));
+			inp.setAttribute('type','text');
+			inp.setAttribute('id','blAdder');
+			inp.setAttribute('value','');
+		var btn = lix.appendChild(document.createElement('input'));
+			btn.setAttribute('type','button');
+			btn.setAttribute('id','blButton');
+			btn.setAttribute('value','+');
+			btn.addEventListener('click',addDomain,false);
+		var lix = ul.appendChild(li.cloneNode(true));
+		var div = lix.appendChild(document.createElement('div'));
+			div.setAttribute('class','blNote');
+			div.appendChild(document.createTextNode('(reload page to refresh deletes)'));
+			div.addEventListener('click',reloadPage,false);
+		blDIV.setAttribute('class','blDIV');
+	}
+}
+
+function reloadPage() {
+	unsafeWindow.location.reload();
+}
+
+function delDomain() {
+	var domain = this.parentNode.childNodes[1].nodeValue.replace(/^\s/,'');
+	if (blacklist.indexOf(domain) == -1) return;
+	var tmp = [];
+	blacklist.forEach(function(d) {
+		if (d==domain) return;
+		tmp.push(d);
+	});
+	GM_setValue('blacklist',tmp.join(','));
+	blacklist = getBlacklist();
+	toggleBlackList();
+	toggleBlackList();
+}
+
+function reloadPage() {
+	unsafeWindow.location.reload();
+}
+
+function addDomain() {
+	var domain = $('blAdder').value;
+		domain = domain.replace(/^\s+/g,'').replace(/\s+$/g,'');
+	if (domain == '') return;
+	addBlacklist(domain);
+	parseResults();
+}
+
+function parseResults() {
+	var li = $('res').getElementsByTagName('li');
+	for (var i=0;i<li.length;i++){
+		var domain = getDomain(li[i].getElementsByTagName('h3')[0]);
+		
+		if (domain && tester(domain)) {
+			// Blacklisted Domain
+			hideResult(li[i]);
 		}
 	}
-};
+}
 
-g.init();
+function tester(domain) {
+	for (var i=0;i<blacklist.length;i++) {
+		var bl = blacklist[i];
+			bl = (/^\//.test(bl) ? bl.replace(/^\//,'').replace(/\/$/,'') : '^'+ bl +'$');
+		var x = new RegExp(bl);
+		if (x.test(domain)) return true;
+	}
+	return false;
+}
 
-Array.prototype.uniq = function() {
-	var old = this;
-	var uniq = [];
-	$.each(old,function(i,key) {
-		if (uniq.indexOf(key) === -1) uniq.push(key);
+function hideResult(li) {
+	var domain = getDomain(li.getElementsByTagName('h3')[0]);
+	while(li.childNodes.length>0) li.removeChild(li.childNodes[0]);
+	var span = li.appendChild(document.createElement('span'))
+		span.setAttribute('class','blackout');
+		span.appendChild(document.createTextNode('Result Blacklisted: '+ domain));
+}
+
+function getBlacklist() {
+	return (GM_getValue('blacklist') ? GM_getValue('blacklist').split(',') : [] );
+}
+
+function addBlacklist(domain) {
+	if (blacklist.indexOf(domain) > -1)	return;
+	blacklist.push(domain);
+	GM_setValue('blacklist',blacklist.join(','));
+	blacklist = getBlacklist();
+	toggleBlackList();
+	toggleBlackList();
+}
+
+function addStyle() {
+	GM_addStyle('span.blacklist { color: #7777CC; font-size: 13px; text-decoration: underline; cursor: pointer; }');
+	GM_addStyle('span.blconfirm { color: #333333; font-size: 13px; text-decoration: none; cursor: default; }');
+	GM_addStyle('span.blyesno   { color: maroon; font-size: 13px; text-decoration: none; cursor: pointer; }');
+	GM_addStyle('span.blackout  { color: #333333; width: 598px; padding: 2px; font-size: 10px;');
+	GM_addStyle('span.blShow    { color: #0000CC; text-decoration: underline; cursor: pointer; }');
+	GM_addStyle('div.blDIV      { background-color: white; padding: 5px; border: 1px solid black; z-index: 100; position: absolute; right: 5px; display: inline; min-width: 300px; top: 0px; overflow: auto; }');
+	GM_addStyle('ul#blDIVul     { margin: 0; padding: 0; min-width: 200px; text-align: left; }');
+	GM_addStyle('ul#blDIVul li  { margin: 0; padding: 0; list-style: none; font-size: 12px; width: 250px; overflow: hidden; }');
+	GM_addStyle('div.noShow     { display: none; ');
+	GM_addStyle('span.blNix     { color: maroon; cursor: pointer; }');
+	GM_addStyle('input#blButton { border: 1px solid silver; font-size: 10px; width: 30px; }');
+	GM_addStyle('input#blAdder  { border: 1px solid silver; font-size: 10px; width: 166px; }');
+	GM_addStyle('div.blNote     { text-align: center; color: #333333; font-size: 10px; font-style:italic; cursor: pointer; }');
+}
+
+function addLinks() {
+	var span = $x('//span[@class="gl"]');
+	
+	span.forEach(function(el) {
+		el.appendChild(document.createTextNode(' - '));
+		var sp = el.appendChild(document.createElement('span'));
+		bldLink(sp);
 	});
-	return uniq;
-};
 
-Array.prototype.remove = function(word) {
-	var old = this;
-	var out = [];
-	$.each(old,function(i,key) {
-		if (key===word) return;
-		out.push(key);
-	});
-	return out;
-};
+}
+
+function bldLink(sp) {
+	sp.setAttribute('class','blacklist');
+	sp.appendChild(document.createTextNode('Blacklist Domain'));
+	sp.addEventListener('click',blacklistDomain,false);	
+}
+
+function getDomain(h3) {
+	try {
+		var href = h3.getElementsByTagName('a')[0].getAttribute('href');
+			href = /https{0,1}:\/\/(.+?)\//.exec(href)[1];
+		return href;
+	} catch(er) {
+		return false;
+	}
+}
+
+function blacklistDomain() {
+	var el = this;
+	while (el.tagName != 'LI') el = el.parentNode;
+	var href = getDomain(el.getElementsByTagName('h3')[0]);
+	showConfirm(this,href);
+}
+
+function showConfirm(el,href) {
+	el.removeEventListener('click',blacklistDomain,false);
+	el.removeChild(el.childNodes[0])
+	el.setAttribute('class','blconfirm');
+	el.appendChild(document.createTextNode('Confirm: '));
+	var yes = el.appendChild(document.createElement('span'));
+		yes.appendChild(document.createTextNode('yes'));
+		yes.setAttribute('class','blyesno');
+		yes.setAttribute('domain',href);
+		yes.addEventListener('mouseup',function() { blConfirm(true,this); },false);
+	el.appendChild(document.createTextNode(' / '));
+	var no = el.appendChild(document.createElement('span'));
+		no.appendChild(document.createTextNode('no'));
+		no.setAttribute('class','blyesno');
+		no.addEventListener('mouseup',function() { blConfirm(false,this); },false);
+}
+
+function blConfirm(tf,el) {
+	if (tf==true) {
+		addBlacklist(el.getAttribute('domain'));
+		parseResults();
+	} else {
+		var sp = el.parentNode;
+		while(sp.childNodes.length>0) sp.removeChild(sp.childNodes[0]);
+		bldLink(sp,1);
+	}
+}
+
+function $x(p, context) {
+	if (!context) context = document;
+	var i, arr = [], xpr = document.evaluate(p, context, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+	for (i = 0; item = xpr.snapshotItem(i); i++) arr.push(item);
+	return arr;
+}
+
+function $(x) {
+	return document.getElementById(x);
+}
