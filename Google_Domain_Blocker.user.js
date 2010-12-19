@@ -2,10 +2,10 @@
 // @name           Google Domain Blocker
 // @namespace      http://jobson.us
 // @description    Blocks irrelevant and spam domains.
-// @include        http://*.google.*/search*
-// @include        http://google.*/search*
-// @include        https://*.google.*/search*
-// @include        https://google.*/search*
+// @include        http://*.google.com/search*
+// @include        http://google.com/search*
+// @include        https://*.google.com/search*
+// @include        https://google.com/search*
 // @require        http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // ==/UserScript==
 
@@ -40,7 +40,7 @@ var g = {
 		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
 		GM_addStyle("span.blConfirm { color: black; display: none; }");
 		GM_addStyle("span.blConfirm span { color: #DB4272; cursor: pointer; }");
-		GM_addStyle("div#blULContainer { height: 300px; overflow: auto; margin: 5px; position: relative;z-index: 2; background-color: #fff; }");
+		GM_addStyle("div#blULContainer { height: 300px; overflow: auto; margin: 5px; }");
 		GM_addStyle("div#blForm { margin-top: 5px; padding: 5px; }");
 		GM_addStyle("li.hidtxt span.domain { font-style: italic; }");
 		GM_addStyle("div#blText { background-color: silver; color: black; padding: 3px; text-align: center; font-weight: bold; }");
