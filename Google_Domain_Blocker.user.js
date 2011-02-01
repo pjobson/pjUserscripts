@@ -183,11 +183,11 @@ var g = {
 						tld = this.toString();
 					}
 				});
-				var domain = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				var domainRe = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				g.addToBlackList(domainRe);
+			} else {
+				g.addToBlackList(domain);
 			}
-			
-			domain = $.trim(domain);
-			g.addToBlackList(domain);
 		} else {
 			$(this).parent().hide()
 			$(this).parent().prev().show();
