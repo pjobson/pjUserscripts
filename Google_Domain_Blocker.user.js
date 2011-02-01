@@ -21,17 +21,11 @@ var g = {
 	bodyHeight: '',
 	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
 	init: function() {
-		// Possibly addresses a bug where the blacklist was duping
-		if ($('#showHideBlacklist').length>0) return;
 		g.loadPrefs();
 		g.eventListeners();
 		g.addStyles();
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
-		
-		// Debug: show the list again.
-//		$('div#blTop').show();
-
 
 		if (g.prefs.blEnable===true) {
 			g.poll = setTimeout(g.pollBodyHeight,1);
@@ -43,16 +37,9 @@ var g = {
 	},
 	
 	loadPrefs: function() {
-		// Debug: unset all prefs.
-//		GM_deleteValue('blEnable');
-//		GM_deleteValue('blRegex');
-//		GM_deleteValue('blDisplay');
-		
-		// If pref is undefined, set it as default otherwise use the set value
-		g.prefs.blEnable 	= (GM_getValue('blEnable')  == undefined) ? g.prefs.blEnable  : GM_getValue('blEnable');
-		g.prefs.blDisplay 	= (GM_getValue('blDisplay') == undefined) ? g.prefs.blDisplay : GM_getValue('blDisplay');
-		g.prefs.blRegex 	= (GM_getValue('blRegex')   == undefined) ? g.prefs.blRegex   : GM_getValue('blRegex');
-		
+		g.prefs.blEnable  = (GM_getValue('blEnable')  !== '') ? GM_getValue('blEnable')  : g.prefs.blEnable;
+		g.prefs.blDisplay = (GM_getValue('blDisplay') !== '') ? GM_getValue('blDisplay') : g.prefs.blDisplay;
+		g.prefs.blRegex   = (GM_getValue('blRegex')   !== '') ? GM_getValue('blRegex')   : g.prefs.blRegex;
 	},
 	
 	togglePref: function(ev) {
@@ -74,7 +61,7 @@ var g = {
 	doPref: function(pref) {
 		switch (pref) {
 			case 'blEnable':
-				window.location.reload()
+				// To use this pref, user must reload page, too much kludge to get it to appear and disappear.
 				break;
 			case 'blDisplay':
 				if (g.prefs[pref]===false) {
@@ -215,7 +202,7 @@ var g = {
 	hideResults: function() {
 		// Hide the results using the blacklist.
 		$('li.g span.f cite').each(function() {
-			var domain = $(this).text().split(' ')[0].split('/')[0];
+			var domain = $(this).text().split('/')[0];
 			var cite = this;
 			var h = false;
 			$.each(g.blacklist,function(i,key) {
@@ -260,7 +247,7 @@ var g = {
 		$('#blTop').append('<div class="blText">Preferences</div>');
 		$('#blTop').append('<div id="blPrefContainer"><ul id="blPrefList"></ul></div>');
 
-		$('#blPrefList').append('<li id="blEnable">Blacklist Enabled'+ prefTxt +'<br/><span class="blDesc">Toggles this userscript. This will reload the page..</span></li>');		
+		$('#blPrefList').append('<li id="blEnable">Blacklist Enabled'+ prefTxt +'<br/><span class="blDesc">Toggles this userscript. Reload page to take effect.</span></li>');		
 		$('#blPrefList').append('<li id="blDisplay">Display Messages'+ prefTxt +'<br/><span class="blDesc">Shows "<span class="domain">domain</span> blacklisted" in SERP.</span></li>');
 		$('#blPrefList').append('<li id="blRegex">RegEx Blocker'+ prefTxt +'<br/><span class="blDesc">Use regex to block full domain name.</span></li>');
 		
