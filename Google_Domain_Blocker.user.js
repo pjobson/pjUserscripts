@@ -113,7 +113,7 @@ var g = {
 	},
 	addStyles: function() {
 		// Adds styles to the DOM
-		GM_addStyle("div#blTop { background-color: white; z-index: 999; }");
+		GM_addStyle("div#blTop { background-color: white; }");
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
 		GM_addStyle("span.showBL { color: #0000CC; text-decoration: underline; cursor: pointer; }");
 		GM_addStyle("div#blTop { position: absolute; top: "+ parseInt($('div#cnt').position().top,10) +"px; right: 5px; border: 1px solid black; width: 240px; padding: 0; }");
