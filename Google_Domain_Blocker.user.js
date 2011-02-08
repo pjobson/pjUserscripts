@@ -187,8 +187,7 @@ var g = {
 	confirmation: function() {
 		// Shows confirmation for adding a domain to the list
 		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('span.f').find('cite').text().split(' ')[0].split('/')[0];
-			
+			var domain = $(this).parents('span.f').find('cite').text().split('/')[0];
 			if (g.prefs.blRegex===true) {
 				var tld = '';
 				var re;
