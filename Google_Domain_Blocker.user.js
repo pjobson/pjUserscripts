@@ -2,8 +2,10 @@
 // @name           Google Domain Blocker
 // @namespace      http://jobson.us
 // @description    Blocks irrelevant and spam domains.
-// @include        http://*.google.*/*
-// @include        https://*.google.*/*
+// @include        http://*.google.*/search*
+// @include        http://google.*/search*
+// @include        https://*.google.*/search*
+// @include        https://google.*/search*
 // @require        http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // ==/UserScript==
 
@@ -15,25 +17,25 @@ var g = {
 		blDisplay: true,
 		blRegex: false
 	},
+	poll: null,
 	blacklist: [],
 	bodyHeight: '',
 	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
 	init: function() {
 		// Possibly addresses a bug where the blacklist was duping
-		if ($('#showHideBlacklist').length>0) return;		
+		if ($('#showHideBlacklist').length>0) return;
 		g.loadPrefs();
 		g.eventListeners();
 		g.addStyles();
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
-				
+		
 		// Debug: show the list again.
 //		$('div#blTop').show();
 //		g.getLastUpdate();
-		
-		// Screen polling function for autopagerize and google instant search
+
 		if (g.prefs.blEnable===true) {
-			setInterval(g.pollBodyHeight,100);
+			g.poll = setTimeout(g.pollBodyHeight,1);
 		}
 		
 		if (g.prefs.blDisplay===false) {
@@ -90,15 +92,12 @@ var g = {
 	},
 	
 	pollBodyHeight: function() {
-		// If the blacklist toggle has been kicked out, add it back in and hide the blacklist
-		if ($('#showHideBlacklist').length==0) {
-			g.addBlacklistToggle();
-			$('div#blTop').hide();
-		}
+		// This is a polling function, I added it for this script to become compatible with autopagination scripts, such as AutoPagerize ( http://autopagerize.net/ )
 		g.addBlackListLinks();
 		g.hideResults();
 		
 		g.bodyHeight=$('body').height();				
+		g.poll = setTimeout(g.pollBodyHeight,500);
 	},
 	
 	eventListeners: function() {
@@ -117,7 +116,7 @@ var g = {
 		GM_addStyle("div#blTop { background-color: white; z-index: 999; }");
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
 		GM_addStyle("span.showBL { color: #0000CC; text-decoration: underline; cursor: pointer; }");
-		GM_addStyle("div#blTop { position: absolute; top: 25px; right: 5px; border: 1px solid black; width: 240px; padding: 0; }");
+		GM_addStyle("div#blTop { position: absolute; top: "+ parseInt($('div#cnt').position().top,10) +"px; right: 5px; border: 1px solid black; width: 240px; padding: 0; }");
 		GM_addStyle("ul#blacklist li { list-style: none; margin: 0; padding: 1px 0 1px 0; }");
 		GM_addStyle("span.ex { color: #DF0101; cursor: pointer; } ");
 		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
@@ -205,10 +204,10 @@ var g = {
 			
 			domain = $.trim(domain);
 			g.addToBlackList(domain);
+		} else {
+			$(this).parent().hide()
+			$(this).parent().prev().show();
 		}
-
-		$(this).parent().hide()
-		$(this).parent().prev().show();
 	},
 	getBlacklist: function() {
 		// Gets the blacklist from greasemonkey
@@ -250,14 +249,9 @@ var g = {
 		$('li.hidtxt').remove();
 		$('li.g').show();
 	},
-	addBlacklistToggle: function() {
-		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
-	},
 	makeBlacklistControls: function() {
 		// Makes the controls for this script
-
-		// This is moved to its own function, due to issues with google instant search.
-		g.addBlacklistToggle();
+		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
 
 		$('body').append('<div id="blTop"><div class="blText">Your Blacklist</div><div id="blULContainer"><ul id="blacklist"></ul></div><div id="blForm"></div></div>');
 		
@@ -288,7 +282,7 @@ var g = {
 		$('#blTop').append('<div id="blUpdated"></div>');
 
 		$('div#blTop').hide();
-				
+		
 		g.buildList();
 	},
 	buildList: function() {
@@ -322,7 +316,7 @@ var g = {
 			method: "GET",
 			url: g.url,
 			onload: function(response) {
-				$('div#blUpdated').html('<a href="http://userscripts.org/scripts/show/33156">'+ $.trim($(response.responseText).find('div#details span.date').text().replace(/\s+/g,' '))+'</a>.');
+				$('div#blUpdated').html($.trim($(response.responseText).find('div#details span.date').text().replace(/\s+/g,' '))+'.');
 			}
 		});
 	},
@@ -334,7 +328,7 @@ var g = {
 
 };
 
-setTimeout(g.init,500);
+g.init();
 
 Array.prototype.uniq = function() {
 	var old = this;
