@@ -5,7 +5,6 @@
 // @include        http://*.google.*/*
 // @include        https://*.google.*/*
 // @require        http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
-// @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
 
 
@@ -30,10 +29,11 @@ var g = {
 				
 		// Debug: show the list again.
 //		$('div#blTop').show();
+//		g.getLastUpdate();
 		
 		// Screen polling function for autopagerize and google instant search
 		if (g.prefs.blEnable===true) {
-			setInterval(g.pollBodyHeight,500);
+			setInterval(g.pollBodyHeight,100);
 		}
 		
 		if (g.prefs.blDisplay===false) {
