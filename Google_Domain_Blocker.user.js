@@ -31,11 +31,9 @@ var g = {
 		// Debug: show the list again.
 //		$('div#blTop').show();
 		
-		// Removed polling function, due to memory CPU usage issue, change to resize/scroll/load listeners
+		// Screen polling function for autopagerize and google instant search
 		if (g.prefs.blEnable===true) {
-			$(window).bind('scroll resize load',function() {
-				g.pollBodyHeight();
-			});
+			setInterval(g.pollBodyHeight,1000);
 		}
 		
 		if (g.prefs.blDisplay===false) {
