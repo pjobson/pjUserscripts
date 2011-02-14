@@ -33,7 +33,7 @@ var g = {
 		
 		// Screen polling function for autopagerize and google instant search
 		if (g.prefs.blEnable===true) {
-			setInterval(g.pollBodyHeight,1000);
+			setInterval(g.pollBodyHeight,500);
 		}
 		
 		if (g.prefs.blDisplay===false) {
