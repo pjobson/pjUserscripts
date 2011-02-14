@@ -97,14 +97,10 @@ var g = {
 			g.addBlacklistToggle();
 			$('div#blTop').hide();
 		}
+		g.addBlackListLinks();
+		g.hideResults();
 		
-		if (g.bodyHeight != $('body').height()) {
-			g.addBlackListLinks();
-			g.hideResults();
-			
-			g.bodyHeight=$('body').height();		
-		}
-		
+		g.bodyHeight=$('body').height();				
 	},
 	
 	eventListeners: function() {
