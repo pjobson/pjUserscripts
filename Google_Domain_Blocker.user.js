@@ -4,8 +4,6 @@
 // @description    Blocks irrelevant and spam domains.
 // @include        http://*.google.*/*
 // @include        https://*.google.*/*
-// @exclude        http://mail.google.com/*
-// @exclude        https://mail.google.com/*
 // @require        http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
@@ -30,9 +28,10 @@ var g = {
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
 				
-		// Debug: always show the list
+		// Debug: show the list again.
 //		$('div#blTop').show();
 		
+		// Removed polling function, due to memory CPU usage issue, change to resize/scroll/load listeners
 		if (g.prefs.blEnable===true) {
 			g.pollBodyHeight();
 			$(window).bind('scroll resize',function() {
@@ -113,8 +112,6 @@ var g = {
 	eventListeners: function() {
 		// Event listeners for this script
 		$('span#showHideBlacklist').live('click',g.showHideBlacklist);
-		$('span#showHideBlacklist').live('mouseover',g.showHideBlacklistHover);
-		$('span#showHideBlacklist').live('mouseout',g.showHideBlacklistHover);
 		$('span.blLink').live('click',g.blacklistThisDomain);
 		$('span.blyes,span.blno').live('click',g.confirmation);
 		$('input#blAddBox').live('keyup',g.manualAdd);
@@ -125,26 +122,20 @@ var g = {
 	},
 	addStyles: function() {
 		// Adds styles to the DOM
-		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: 31px; right: 5px; border: 1px solid black; width: 240px; padding: 0;  }");
-
+		GM_addStyle("div#blTop { background-color: white; z-index: 999; }");
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
+		GM_addStyle("span.showBL { color: #0000CC; text-decoration: underline; cursor: pointer; }");
+		GM_addStyle("div#blTop { position: absolute; top: 25px; right: 5px; border: 1px solid black; width: 240px; padding: 0; }");
 		GM_addStyle("ul#blacklist li { list-style: none; margin: 0; padding: 1px 0 1px 0; }");
 		GM_addStyle("span.ex { color: #DF0101; cursor: pointer; } ");
 		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
 		GM_addStyle("span.blConfirm { color: black; display: none; }");
-		
-        GM_addStyle("span.blConfirm span.blyes { color: #D13B3B; cursor: pointer; }");
-        GM_addStyle("span.blConfirm span.blno { color: #0E774A; cursor: pointer; }");
-		
+		GM_addStyle("span.blConfirm span { color: #DB4272; cursor: pointer; }");
 		GM_addStyle("div#blULContainer { cursor: default; height: 300px; overflow: auto; margin: 5px; position: relative;z-index: 2; background-color: #fff; }");
 		GM_addStyle("div#blForm { margin-top: 5px; padding: 5px; }");
-
-		GM_addStyle("li.hidtxt span.domain { text-decoration: line-through; }");
-
+		GM_addStyle("li.hidtxt span.domain { font-style: italic; }");
 		GM_addStyle("div.blText { background-color: white; background-color: #C9D7F1; color: black; padding: 3px; text-align: center; font-weight: bold; }");
-
-		GM_addStyle("span#showHideBlacklist { padding: 0 16px 0 6px; color: #3366CC !important; font-weight: bold; font-size: 13px; }");
-
+		GM_addStyle("span#showHideBlacklist { margin-right: 10px; }");
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
 		GM_addStyle("div#blPrefContainer { cursor: default; background-color: white; margin: 5px; z-index: 2; }");
@@ -194,7 +185,7 @@ var g = {
 		// Adds blacklist & confirm links to each SERP
 		$('li.g span.f span.gl').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			$(this).append(' - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span>');
+			$(this).append(' - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">yes</span> / <span class="blno">no</span></span>');
 		});
 	},
 	blacklistThisDomain: function() {
@@ -268,10 +259,7 @@ var g = {
 		$('li.g').show();
 	},
 	addBlacklistToggle: function() {
-//		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
-		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
-		$('div#gbg ol.gbtc').append('<li class="gbt"><span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span></li>');
-
+		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
 	},
 	makeBlacklistControls: function() {
 		// Makes the controls for this script
@@ -327,13 +315,6 @@ var g = {
 			// hide the blacklist
 			$('span#showHideBlacklist').html('Show Blacklist');
 			$('div#blTop').hide();
-		}
-	},
-	showHideBlacklistHover: function(evnt) {
-		if (evnt.type=='mouseover') {
-			$('span#showHideBlacklist').addClass('gbgt-hvr');
-		} else {
-			$('span#showHideBlacklist').removeClass('gbgt-hvr');
 		}
 	},
 	// Image from: http://www.webstuffshare.com/2010/03/stylize-your-own-checkboxes/
