@@ -34,7 +34,7 @@ var g = {
 		// Removed polling function, due to memory CPU usage issue, change to resize/scroll/load listeners
 		if (g.prefs.blEnable===true) {
 			g.pollBodyHeight();
-			$(window).bind('scroll resize',function() {
+			$(window).bind('scroll resize load',function() {
 				g.pollBodyHeight();
 			});
 		}
@@ -94,7 +94,6 @@ var g = {
 	
 	pollBodyHeight: function() {
 		// If the blacklist toggle has been kicked out, add it back in and hide the blacklist
-		// Edge case, not sure why it gets kicked out sometimes.
 		if ($('#showHideBlacklist').length==0) {
 			g.addBlacklistToggle();
 			$('div#blTop').hide();
