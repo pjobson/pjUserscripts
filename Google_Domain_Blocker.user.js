@@ -133,8 +133,8 @@ var g = {
 		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
 		GM_addStyle("span.blConfirm { color: black; display: none; }");
 		
-        GM_addStyle("span.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
-        GM_addStyle("span.blConfirm span.blno { color: #D13B3B; cursor: pointer; }");
+        GM_addStyle("span.blConfirm span.blyes { color: #D13B3B; cursor: pointer; }");
+        GM_addStyle("span.blConfirm span.blno { color: #0E774A; cursor: pointer; }");
 		
 		GM_addStyle("div#blULContainer { cursor: default; height: 300px; overflow: auto; margin: 5px; position: relative;z-index: 2; background-color: #fff; }");
 		GM_addStyle("div#blForm { margin-top: 5px; padding: 5px; }");
