@@ -7,8 +7,6 @@
 // @exclude        http://*.google.*/*&tbs=shop*
 // @exclude        http://mail.google.com/*
 // @exclude        https://mail.google.com/*
-// @exclude        http://docs.google.com/*
-// @exclude        https://docs.google.com/*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
