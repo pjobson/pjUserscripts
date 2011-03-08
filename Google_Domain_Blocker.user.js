@@ -103,7 +103,7 @@ var g = {
 			g.addBlacklistToggle();
 			$('div#blTop').hide();
 		}
-
+		
 		if (g.bodyHeight != $('body').height()) {
 			g.addBlackListLinks();
 			g.hideResults();
@@ -195,9 +195,9 @@ var g = {
 	},
 	addBlackListLinks: function() {
 		// Adds blacklist & confirm links to each SERP
-		$('li.g div.s').each(function() {
+		$('li.g span.f span.gl').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			$(this).find('span.f:first').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
+			$(this).append(' - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span>');
 		});
 	},
 	blacklistThisDomain: function() {
