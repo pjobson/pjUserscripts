@@ -13,8 +13,6 @@
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
 
-var console = unsafeWindow.console;
-
 
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
@@ -130,13 +128,12 @@ var g = {
 	},
 	addStyles: function() {
 		// Adds styles to the DOM
-		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: 31px; right: 5px; border: 1px solid black; width: 300px; padding: 0;  }");
+		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: 31px; right: 5px; border: 1px solid black; width: 240px; padding: 0;  }");
 
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
 		GM_addStyle("ul#blacklist li { list-style: none; margin: 0; padding: 1px 0 1px 0; }");
 		GM_addStyle("span.ex { color: #DF0101; cursor: pointer; } ");
 		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
-		GM_addStyle("span.blLink:hover { text-decoration: underline; } ");
 		GM_addStyle("span.blConfirm { color: black; display: none; }");
 		
         GM_addStyle("span.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
@@ -200,7 +197,7 @@ var g = {
 		// Adds blacklist & confirm links to each SERP
 		$('li.g div.s').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			$(this).find('div.f').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
+			$(this).find('span.f:first').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
 		});
 	},
 	blacklistThisDomain: function() {
@@ -211,8 +208,8 @@ var g = {
 	confirmation: function() {
 		// Shows confirmation for adding a domain to the list
 		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('div.f').find('cite:first').text().replace(/[\/\s].+/,'');
-
+			var domain = $(this).parents('span.f').find('cite').text().split(' ')[0].split('/')[0];
+			
 			if (g.prefs.blRegex===true) {
 				var tld = '';
 				var re;
@@ -223,7 +220,7 @@ var g = {
 						tld = this.toString();
 					}
 				});
-				domain = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				var domain = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
 			}
 			
 			domain = $.trim(domain);
@@ -242,7 +239,7 @@ var g = {
 	},
 	hideResults: function() {
 		// Hide the results using the blacklist.
-		$('li.g cite').each(function() {
+		$('li.g span.f cite').each(function() {
 			var domain = $(this).text().split(' ')[0].split('/')[0];
 			var cite = this;
 			var h = false;
