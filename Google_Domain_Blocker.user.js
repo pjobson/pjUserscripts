@@ -9,8 +9,6 @@
 // @exclude        https://mail.google.com/*
 // @exclude        http://docs.google.com/*
 // @exclude        https://docs.google.com/*
-// @exclude        http://plus.google.com/*
-// @exclude        https://plus.google.com/*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
@@ -202,7 +200,7 @@ var g = {
 		// Adds blacklist & confirm links to each SERP
 		$('li.g div.s').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			$(this).find('div.f:first').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
+			$(this).find('div.f').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
 		});
 	},
 	blacklistThisDomain: function() {
