@@ -2,52 +2,15 @@
 // @name           Google Domain Blocker
 // @namespace      http://jobson.us
 // @description    Blocks irrelevant and spam domains.
-// @include        *://*.google.*/*
-// @exclude        *://*.google.*/*&tbs=shop*
-// @exclude        *://*.google.*/*tbm=isch*
-// @exclude        *://mail.google.com/*
-// @exclude        *://docs.google.com/*
-// @exclude        *://plus.google.com/*
-// @exclude        *://www.google.com/calendar/*
-// @exclude        *://www.google.com/accounts/*
-// @exclude        *://www.google.com/reader/*
-// @exclude        *://sites.google.com/*
-// @exclude        *://groups.google.com/*
-// @exclude        *://www.google.com/imghp*
-// @exclude        *://translate.google.com/*
-// @exclude        *://news.google.com/*
-// @exclude        *://books.google.com/*
-// @exclude        *://www.google.com/finance*
-// @exclude        *://scholar.google.com/*
-// @exclude        *://blogsearch.google.com/*
-// @exclude        *://www.google.com/chrome*
-// @exclude        *://www.google.com/ig*
-// @exclude        *://www.google.com/bookmarks*
-// @exclude        *://toolbar.google.com/*
-// @exclude        *://www.google.com/mobile/*
-// @exclude        *://images.google.com/*
-// @exclude        *://video.google.com/*
-// @exclude        *://picasa.google.com/*
-// @exclude        *://latitude.google.com*
-// @exclude        *://maps.google.com/*
-// @exclude        *://earth.google.com/*
-// @exclude        *://www.google.com/talk/*
-// @exclude        *://voice.google.com*
-// @exclude        *://sketchup.google.com/*
-// @exclude        *://desktop.google.com/*
-// @exclude        *://pack.google.com/*
-// @exclude        *://checkout.google.com/*
-// @exclude        *://www.google.com/health*
-// @exclude        *://knol.google.com/*
-// @exclude        *://www.google.com/blogsearch*
-// @exclude        *://www.google.com/coop/*
-// @exclude        *://www.google.com/patents*
-// @exclude        *://www.google.com/products*
-// @exclude        *://www.google.com/schhp*
-// @exclude        *://www.google.com/alerts*
-// @exclude        *://www.google.com/trends*
-// @exclude        *://www.google.com/fusiontables*
-// @exclude        *://code.google.com/*
+// @include        http://*.google.*/*
+// @include        https://*.google.*/*
+// @exclude        http://*.google.*/*&tbs=shop*
+// @exclude        http://mail.google.com/*
+// @exclude        https://mail.google.com/*
+// @exclude        http://docs.google.com/*
+// @exclude        https://docs.google.com/*
+// @exclude        http://plus.google.com/*
+// @exclude        https://plus.google.com/*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
@@ -237,9 +200,9 @@ var g = {
 	},
 	addBlackListLinks: function() {
 		// Adds blacklist & confirm links to each SERP
-		$('li.g').each(function() {
+		$('li.g div.s').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			$(this).find('span.gl:last').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
+			$(this).find('div.f:first').append('<span class="gl"> - <span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span>');
 		});
 	},
 	blacklistThisDomain: function() {
