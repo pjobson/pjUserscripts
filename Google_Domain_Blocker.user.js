@@ -250,7 +250,7 @@ var g = {
 	confirmation: function() {
 		// Shows confirmation for adding a domain to the list
 		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('li.g').find('cite:first').text().replace(/[\/\s].+/,'');
+			var domain = $(this).parents('div.f').find('cite:first').text().replace(/[\/\s].+/,'');
 
 			if (g.prefs.blRegex===true) {
 				var tld = '';
@@ -313,6 +313,7 @@ var g = {
 		$('li.g').show();
 	},
 	addBlacklistToggle: function() {
+//		$('div#guser').append(' | <span class="showBL" id="showHideBlacklist">Show Blacklist</span>');
 		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
 		$('div#gbg ol.gbtc').append('<li class="gbt"><span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span></li>');
 
