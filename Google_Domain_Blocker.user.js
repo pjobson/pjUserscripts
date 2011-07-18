@@ -165,10 +165,7 @@ var g = {
 		$('input#blAddBtn').live('click',g.manualAdd);
 		$('span.ex').live('click',g.removeFromBlackList);
 		
-		$('span.blPref').live('click',g.togglePref);
-		
-		$('button#blImport').live('click',g.import);
-		$('button#blExport').live('click',g.export);
+		$('span.blPref').live('click',g.togglePref);		
 	},
 	addStyles: function() {
 		// Adds styles to the DOM
@@ -197,36 +194,12 @@ var g = {
 		GM_addStyle("input#blAddBtn { width: 40px; }");
 		GM_addStyle("div#blPrefContainer { cursor: default; background-color: white; margin: 5px; z-index: 2; }");
 		GM_addStyle("ul#blPrefList li { list-style: none; margin: 0; padding: 1px 0 10px 0; }");
-		
-		GM_addStyle("div#blPortContainer { cursor: default; background-color: white; margin: 5px; z-index: 2; text-align: center; }");
-		GM_addStyle("div#blPortContainer button { font-size: 12px; }");
-		GM_addStyle("div#blPortContainer textarea#blPortBox { width: 250px; height: 100px; font-family: courier new; font-size: 10px; }");
-
 
 		GM_addStyle("span.blOn { float: right; width: 68px; height: 28px; overflow: hidden; cursor: pointer; background: transparent url("+ g.onoffData +") 0 0 no-repeat; }");
 		GM_addStyle("span.blOff { float: right; width: 68px; height: 28px; overflow: hidden; cursor: pointer; background: transparent url("+ g.onoffData +") -68px 0 no-repeat; }");
 		GM_addStyle("span.blDesc { font-size: 0.75em; }");
 		
 		GM_addStyle("div#blUpdated { margin: 3px; text-align: center; }");
-	},
-	selectText: function() {
-		// For some reason in GM 0.9.6 an exception is thrown here.
-		try {
-			$('textarea#blPortBox').select();
-		} catch(er) {}
-	},
-	export: function() {
-		$('#blPortBox').val(JSON.stringify(g.blacklist));
-		$('textarea#blPortBox').live('click',g.selectText);
-	},
-	import: function() {
-		$('textarea#blPortBox').die('click');
-
-		$.each(JSON.parse($('#blPortBox').val()),function() {
-			g.addToBlackList(this.toString());
-		});
-		
-		$('#blPortBox').val('');
 	},
 	saveBlacklist: function() {
 		// Saves g.blacklist to greasemonkey blacklist
@@ -372,14 +345,6 @@ var g = {
 			}
 		});
 		
-		// Import/Export
-		
-		$('#blTop').append('<div class="blText">Import/Export</div>');
-		$('#blTop').append('<div id="blPortContainer"></div>');
-		$('#blPortContainer').append('<button id="blImport">Import</button>&nbsp;<button id="blExport">Export</button>');
-		$('#blPortContainer').append('<br/>');
-		$('#blPortContainer').append('<textarea id="blPortBox"></textarea>');
-		
 		$('div#blTop').hide();
 				
 		g.buildList();
@@ -443,31 +408,3 @@ Array.prototype.remove = function(word) {
 	});
 	return out;
 };
-
-
-
-var JSON;if(!JSON){JSON={};}
-(function(){"use strict";function f(n){return n<10?'0'+n:n;}
-if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+
-f(this.getUTCMonth()+1)+'-'+
-f(this.getUTCDate())+'T'+
-f(this.getUTCHours())+':'+
-f(this.getUTCMinutes())+':'+
-f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}
-var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}
-function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}
-if(typeof rep==='function'){value=rep.call(holder,key,value);}
-switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}
-gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}
-v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}
-if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){if(typeof rep[i]==='string'){k=rep[i];v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}
-v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}
-if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}
-rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}
-return str('',{'':value});};}
-if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}
-return reviver.call(holder,key,value);}
-text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+
-('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}
-if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}
-throw new SyntaxError('JSON.parse');};}}());
