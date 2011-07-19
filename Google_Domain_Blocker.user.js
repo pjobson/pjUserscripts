@@ -5,50 +5,49 @@
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
-// @exclude        *://blogsearch.google.com/*
-// @exclude        *://books.google.com/*
-// @exclude        *://checkout.google.com/*
-// @exclude        *://code.google.com/*
-// @exclude        *://desktop.google.com/*
-// @exclude        *://docs.google.com/*
-// @exclude        *://earth.google.com/*
-// @exclude        *://groups.google.com/*
-// @exclude        *://images.google.com/*
-// @exclude        *://knol.google.com/*
-// @exclude        *://latitude.google.com*
 // @exclude        *://mail.google.com/*
-// @exclude        *://maps.google.com/*
-// @exclude        *://news.google.com/*
-// @exclude        *://pack.google.com/*
-// @exclude        *://picasa.google.com/*
+// @exclude        *://docs.google.com/*
 // @exclude        *://plus.google.com/*
-// @exclude        *://scholar.google.com/*
+// @exclude        *://www.google.com/calendar/*
+// @exclude        *://www.google.com/accounts/*
+// @exclude        *://www.google.com/reader/*
 // @exclude        *://sites.google.com/*
-// @exclude        *://sketchup.google.com/*
-// @exclude        *://toolbar.google.com/*
-// @exclude        *://translate.google.com/*
-// @exclude        *://video.google.com/*
-// @exclude        *://voice.google.com*
-// @exclude        *://www.google.com/accounts*
-// @exclude        *://www.google.com/alerts*
-// @exclude        *://www.google.com/blogsearch*
-// @exclude        *://www.google.com/bookmarks*
-// @exclude        *://www.google.com/calendar*
-// @exclude        *://www.google.com/chrome*
-// @exclude        *://www.google.com/coop*
-// @exclude        *://www.google.com/finance*
-// @exclude        *://www.google.com/fusiontables*
-// @exclude        *://www.google.com/health*
-// @exclude        *://www.google.com/history*
-// @exclude        *://www.google.com/ig*
+// @exclude        *://groups.google.com/*
 // @exclude        *://www.google.com/imghp*
-// @exclude        *://www.google.com/mobile*
+// @exclude        *://translate.google.com/*
+// @exclude        *://news.google.com/*
+// @exclude        *://books.google.com/*
+// @exclude        *://www.google.com/finance*
+// @exclude        *://scholar.google.com/*
+// @exclude        *://blogsearch.google.com/*
+// @exclude        *://www.google.com/chrome*
+// @exclude        *://www.google.com/ig*
+// @exclude        *://www.google.com/bookmarks*
+// @exclude        *://toolbar.google.com/*
+// @exclude        *://www.google.com/mobile/*
+// @exclude        *://images.google.com/*
+// @exclude        *://video.google.com/*
+// @exclude        *://picasa.google.com/*
+// @exclude        *://latitude.google.com*
+// @exclude        *://maps.google.com/*
+// @exclude        *://earth.google.com/*
+// @exclude        *://www.google.com/talk/*
+// @exclude        *://voice.google.com*
+// @exclude        *://sketchup.google.com/*
+// @exclude        *://desktop.google.com/*
+// @exclude        *://pack.google.com/*
+// @exclude        *://checkout.google.com/*
+// @exclude        *://www.google.com/health*
+// @exclude        *://knol.google.com/*
+// @exclude        *://www.google.com/blogsearch*
+// @exclude        *://www.google.com/coop/*
 // @exclude        *://www.google.com/patents*
 // @exclude        *://www.google.com/products*
-// @exclude        *://www.google.com/reader*
 // @exclude        *://www.google.com/schhp*
-// @exclude        *://www.google.com/talk*
+// @exclude        *://www.google.com/alerts*
 // @exclude        *://www.google.com/trends*
+// @exclude        *://www.google.com/fusiontables*
+// @exclude        *://code.google.com/*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
@@ -192,7 +191,7 @@ var g = {
 
 		GM_addStyle("div.blText { background-color: white; background-color: #C9D7F1; color: black; padding: 3px; text-align: center; font-weight: bold; }");
 
-		GM_addStyle("span#showHideBlacklist { padding: 0 16px 0 6px; color: #3366CC !important; font-weight: normal; font-size: 13px; }");
+		GM_addStyle("span#showHideBlacklist { padding: 0 16px 0 6px; color: #3366CC !important; font-weight: bold; font-size: 13px; }");
 
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
@@ -341,9 +340,7 @@ var g = {
 		$('li.g').show();
 	},
 	addBlacklistToggle: function() {
-
 		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
-		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
 		$('div#gbg ol.gbtc').append('<li class="gbt"><span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span></li>');
 
 	},
