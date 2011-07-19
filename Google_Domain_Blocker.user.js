@@ -5,7 +5,6 @@
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
-// @exclude        *://*.google.*/*tbm=vid*
 // @exclude        *://blogsearch.google.com/*
 // @exclude        *://books.google.com/*
 // @exclude        *://checkout.google.com/*
