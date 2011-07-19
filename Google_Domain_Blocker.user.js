@@ -55,6 +55,7 @@
 
 var console = unsafeWindow.console;
 
+
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
 	prefs: {
@@ -79,10 +80,9 @@ var g = {
 		
 		if (g.prefs.blEnable===true) {
 			g.pollBodyHeight();
-
-			$('#res').bind('DOMSubtreeModified',g.pollBodyHeight);
-			$('#lst-ib').bind('keyup',g.pollBodyHeight);
-
+			$(window).bind('scroll resize',function() {
+				g.pollBodyHeight();
+			});
 		}
 		
 		if (g.prefs.blDisplay===false) {
@@ -278,8 +278,8 @@ var g = {
 	confirmation: function() {
 		// Shows confirmation for adding a domain to the list
 		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('li.g').find('cite:first').text().replace(/[\/\s].+/,'').replace(/\/$/,'');
-			
+			var domain = $(this).parents('li.g').find('cite:first').text().replace(/[\/\s].+/,'');
+
 			if (g.prefs.blRegex===true) {
 				var tld = '';
 				var re;
@@ -448,16 +448,7 @@ Array.prototype.remove = function(word) {
 };
 
 
-/*
-http://www.JSON.org/json2.js
-2011-02-23
 
-Public Domain.
-
-NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-See http://www.JSON.org/js.html
-*/
 var JSON;if(!JSON){JSON={};}
 (function(){"use strict";function f(n){return n<10?'0'+n:n;}
 if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+
