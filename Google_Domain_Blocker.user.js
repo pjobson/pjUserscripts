@@ -54,7 +54,7 @@
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
 
-//var console = (unsafeWindow.console) ? unsafeWindow.console : $.noop;
+var console = (unsafeWindow.console) ? unsafeWindow.console : $.noop;
 
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
@@ -86,6 +86,7 @@ var g = {
 			$(window).bind('scroll',g.pollBodyHeight);
 			$('#lst-ib').bind('keyup',g.pollBodyHeight);
 			$('button.lsb').bind('click',g.pollBodyHeight);
+
 		}
 		
 		if (g.prefs.blDisplay===false) {
@@ -269,7 +270,6 @@ var g = {
 		// Adds blacklist & confirm links to each SERP
 		$('li.g').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
-			if ($(this).find('img#lu_map').length>0) return;
 			$(this).find('cite:first').parent().after('<div><span class="gl"><span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span><div>');
 		});
 	},
