@@ -194,7 +194,7 @@ var g = {
 
 		GM_addStyle("div.blText { background-color: white; background-color: #C9D7F1; color: black; padding: 3px; text-align: center; font-weight: bold; }");
 
-		GM_addStyle("span#showHideBlacklist { color: #BBBBBB !important; font-weight: bold; font-size: 13px; line-height: 27px; padding-top: 2px; right: 25px; position: absolute; }");
+		GM_addStyle("span#showHideBlacklist { padding: 0 16px 0 6px; color: #3366CC !important; font-weight: normal; font-size: 13px; }");
 
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
@@ -347,7 +347,7 @@ var g = {
 
 		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
 		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
-		$('#gbx3').append('<span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span>');
+		$('div#gbg ol.gbtc').append('<li class="gbt"><span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span></li>');
 
 	},
 	makeBlacklistControls: function() {
