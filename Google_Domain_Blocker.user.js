@@ -50,7 +50,6 @@
 // @exclude        *://www.google.com/schhp*
 // @exclude        *://www.google.com/talk*
 // @exclude        *://www.google.com/trends*
-// @exclude        *://www.google.com/xhtml*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
