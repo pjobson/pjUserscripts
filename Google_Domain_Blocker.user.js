@@ -2,8 +2,6 @@
 // @name           Google Domain Blocker
 // @namespace      http://jobson.us
 // @description    Blocks irrelevant and spam domains.
-// @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
-// @downloadURL    http://userscripts.org/scripts/source/33156.user.js
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -57,9 +55,7 @@
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
 // ==/UserScript==
 
-//var console = (console) ? unsafeWindow.console : $.noop;
-
-console.log(this);
+//var console = (unsafeWindow.console) ? unsafeWindow.console : $.noop;
 
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
@@ -79,7 +75,7 @@ var g = {
 		g.addStyles();
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
-
+				
 		// Debug: always show the list
 //		$('div#blTop').show();
 		
@@ -180,7 +176,7 @@ var g = {
 	},
 	addStyles: function() {
 		// Adds styles to the DOM
-		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: 75px; right: 5px; border: 1px solid black; width: 300px; padding: 0;  }");
+		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: 31px; right: 5px; border: 1px solid black; width: 300px; padding: 0;  }");
 
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
 		GM_addStyle("ul#blacklist li { list-style: none; margin: 0; padding: 1px 0 1px 0; }");
@@ -199,7 +195,7 @@ var g = {
 
 		GM_addStyle("div.blText { background-color: white; background-color: #C9D7F1; color: black; padding: 3px; text-align: center; font-weight: bold; }");
 
-		GM_addStyle("span#showHideBlacklist { color: #black !important; font-weight: bold; font-size: 13px; line-height: 27px; padding-top: 2px; right: 25px; position: absolute; }");
+		GM_addStyle("span#showHideBlacklist { color: #BBBBBB !important; font-weight: bold; font-size: 13px; line-height: 27px; padding-top: 2px; right: 25px; position: absolute; }");
 
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
@@ -352,9 +348,7 @@ var g = {
 
 		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
 		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
-		$('#gbqfw').append('<span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span>');
-		
-		
+		$('#gbx3').append('<span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span>');
 
 	},
 	makeBlacklistControls: function() {
@@ -364,7 +358,7 @@ var g = {
 		g.addBlacklistToggle();
 
 		$('body').append('<div id="blTop"><div class="blText">Your Blacklist</div><div id="blULContainer"><ul id="blacklist"></ul></div><div id="blForm"></div></div>');
-				
+		
 		$('div#blForm').append('<input type="text" id="blAddBox" /><input type="button" value="add" id="blAddBtn" />');
 		$('div#blForm').append('<br/><span class="blDesc">Regular expressions are supported, do not use i or g flags.');
 		
