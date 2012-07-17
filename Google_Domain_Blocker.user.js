@@ -59,6 +59,8 @@
 
 //var console = (console) ? unsafeWindow.console : $.noop;
 
+console.log(this);
+
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
 	timeout: null,
