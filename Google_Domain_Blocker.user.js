@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2012.08.28
+// @version        2012.08.25
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -56,11 +56,6 @@
 // @exclude        *://www.google.com/xhtml*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @require        http://sizzlemctwizzle.com/updater.php?id=33156
-// @grant          GM_addStyle
-// @grant          GM_deleteValue
-// @grant          GM_getValue
-// @grant          GM_setValue
-// @grant          GM_registerMenuCommand
 // ==/UserScript==
 
 var g = {
