@@ -30,7 +30,6 @@
 // @exclude        *://scholar.google.com/*
 // @exclude        *://sites.google.com/*
 // @exclude        *://sketchup.google.com/*
-// @exclude        *://talkgadget.google.com/*
 // @exclude        *://toolbar.google.com/*
 // @exclude        *://translate.google.com/*
 // @exclude        *://video.google.com/*
