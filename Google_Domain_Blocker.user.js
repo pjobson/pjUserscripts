@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2012.08.28.02
+// @version        2012.08.28.01
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -26,7 +26,6 @@
 // @exclude        *://pack.google.com/*
 // @exclude        *://picasa.google.com/*
 // @exclude        *://plus.google.com/*
-// @exclude        *://plusone.google.com/*
 // @exclude        *://scholar.google.com/*
 // @exclude        *://sites.google.com/*
 // @exclude        *://sketchup.google.com/*
@@ -226,7 +225,7 @@ var g = {
 		
 		
 		
-		GM_addStyle("#showHideBlacklist { font-size: 12px; color: black; background-color: white; position: absolute; top: 25px; right: 3px; z-index: 999; border: 1px solid black; padding: 3px; }");
+		GM_addStyle("#showHideBlacklist { font-size: 15px; color: black; background-color: white; position: absolute; top: 2px; right: 3px; z-index: 999; border: 1px solid black; padding: 3px; }");
 
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
