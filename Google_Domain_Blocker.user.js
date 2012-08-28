@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2012.08.28.01
+// @version        2012.08.28
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -172,7 +172,7 @@ var g = {
 		
 	eventListeners: function() {
 		// Show/Hide Blacklist Buttons
-		$('#showHideBlacklist').live('click',g.showHideBlacklist);
+		$('span#showHideBlacklist').live('click',g.showHideBlacklist);
 		$('div#blClose').live('click',g.showHideBlacklist);
 		
 		// Blacklisting Link
@@ -225,7 +225,7 @@ var g = {
 		
 		
 		
-		GM_addStyle("#showHideBlacklist { font-size: 15px; color: black; background-color: white; position: absolute; top: 2px; right: 3px; z-index: 999; border: 1px solid black; padding: 3px; }");
+		GM_addStyle("span#showHideBlacklist { color: #black !important; font-weight: bold; font-size: 13px; line-height: 27px; padding-top: 2px; right: 25px; position: absolute; }");
 
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
@@ -382,9 +382,9 @@ var g = {
 		$('li.g').show();
 	},
 	addBlacklistToggle: function() {
-//		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
-//		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
-		$('body').prepend('<div class="showBL gbgt" id="showHideBlacklist">Show Blacklist</div>');
+		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
+		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
+		$('#gbqfw').append('<span class="showBL gbgt" id="showHideBlacklist">Show Blacklist</span>');
 	},
 	makeBlacklistControls: function() {
 		// Makes the controls for this script
@@ -445,13 +445,13 @@ var g = {
 	},
 	showHideBlacklist: function() {
 		// Shows or hides the blacklist drop menu
-		if (/Show/.test($('#showHideBlacklist').text())) {
+		if (/Show/.test($('span#showHideBlacklist').text())) {
 			// show the blacklist
-			$('#showHideBlacklist').html('Hide Blacklist');
+			$('span#showHideBlacklist').html('Hide Blacklist');
 			$('div#blTop').show();
 		} else {
 			// hide the blacklist
-			$('#showHideBlacklist').html('Show Blacklist');
+			$('span#showHideBlacklist').html('Show Blacklist');
 			$('div#blTop').hide();
 		}
 	},
