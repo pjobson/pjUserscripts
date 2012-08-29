@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2012.09.26
+// @version        2012.08.28.02
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -30,6 +30,7 @@
 // @exclude        *://scholar.google.com/*
 // @exclude        *://sites.google.com/*
 // @exclude        *://sketchup.google.com/*
+// @exclude        *://talkgadget.google.com/*
 // @exclude        *://toolbar.google.com/*
 // @exclude        *://translate.google.com/*
 // @exclude        *://video.google.com/*
@@ -88,8 +89,8 @@ var g = {
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
 
-//		Debug: always show the list
-//		$('div#blTop').show();
+// Debug: always show the list
+//$('div#blTop').show();
 		
 		
 		if (g.prefs.blEnable===true) {
@@ -313,8 +314,8 @@ var g = {
 	confirmation: function() {
 		// Shows confirmation for adding a domain to the list
 		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('li.g').find('cite:first').text().replace(/^https:\/\//,'').replace(/[\/\s].+/,'').replace(/\/$/,'');
-						
+			var domain = $(this).parents('li.g').find('cite:first').text().replace(/[\/\s].+/,'').replace(/\/$/,'');
+			
 			if (g.prefs.blRegex===true) {
 				var tld = '';
 				var re;
@@ -327,7 +328,7 @@ var g = {
 				});
 				domain = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
 			}
-						
+			
 			domain = $.trim(domain);
 			g.addToBlackList(domain);
 		}
@@ -345,10 +346,7 @@ var g = {
 	hideResults: function() {
 		// Hide the results using the blacklist.
 		$('li.g cite').each(function() {
-			var domain = $(this).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
-			
-			console.log(domain);
-			
+			var domain = $(this).text().split(' ')[0].split('/')[0];
 			var cite = this;
 			var h = false;
 			$.each(g.blacklist,function(i,key) {
