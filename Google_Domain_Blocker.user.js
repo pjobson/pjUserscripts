@@ -92,8 +92,6 @@ var g = {
 
 //		Debug: always show the list
 //		$('div#blTop').show();
-//		Debug: Empty Blacklist
-//		GM_setValue('blacklist','');
 		
 		
 		if (g.prefs.blEnable===true) {
@@ -329,7 +327,7 @@ var g = {
 						tld = this.toString();
 					}
 				});
-				domain = '/([a-z0-9\\.]+)*\\.'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				domain = '/([a-z0-9]+\\.)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
 			}
 						
 			domain = $.trim(domain);
@@ -350,6 +348,8 @@ var g = {
 		// Hide the results using the blacklist.
 		$('li.g cite').each(function() {
 			var domain = $(this).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
+			
+			console.log(domain);
 			
 			var cite = this;
 			var h = false;
@@ -388,6 +388,8 @@ var g = {
 		$('li.g').show();
 	},
 	addBlacklistToggle: function() {
+//		$($('div#gbg ol.gbtc li')[1]).addClass('gbtb');
+//		$('div#gbg ol.gbtc').append('<li class="gbt gbtb"><span class="gbts"></span></li>');
 		$('body').prepend('<div class="showBL gbgt" id="showHideBlacklist">Show Blacklist</div>');
 	},
 	makeBlacklistControls: function() {
