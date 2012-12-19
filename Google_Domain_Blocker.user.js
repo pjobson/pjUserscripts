@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2013.01.08
+// @version        2012.10.08
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -89,7 +89,6 @@ var g = {
 		g.addStyles();
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
-		g.searchDIV;
 
 //		Debug: always show the list
 //		$('div#blTop').show();
@@ -99,6 +98,11 @@ var g = {
 		
 		if (g.prefs.blEnable===true) {
 			g.pollBodyHeight();
+
+			$('#res').bind('DOMSubtreeModified',g.pollBodyHeight);
+			$(window).bind('scroll',g.pollBodyHeight);
+			$('#lst-ib').bind('keyup',g.pollBodyHeight);
+			$('button.lsb').bind('click',g.pollBodyHeight);
 		}
 		
 		if (g.prefs.blDisplay===false) {
@@ -107,9 +111,6 @@ var g = {
 	},
 	
 	pollBodyHeight: function() {
-		// Disable checking until page is settled.
-		$('div#search').die('DOMSubtreeModified',g.pollBodyHeight);
-		
 		// If the blacklist toggle has been kicked out, add it back in and hide the blacklist
 		// Edge case, not sure why it gets kicked out sometimes.
 		if ($('#showHideBlacklist').length==0) {
@@ -117,13 +118,12 @@ var g = {
 			$('div#blTop').hide();
 		}
 		
-		window.setTimeout(function() {
+		window.clearTimeout(g.timeout);
+		
+		g.timeout = window.setTimeout(function() {
 			g.addBlackListLinks();
 			g.hideResults();
-			$('div#search').live('DOMSubtreeModified',g.pollBodyHeight);
-		},750);
-		
-
+		},500);
 	},
 	
 	loadPrefs: function() {
@@ -213,9 +213,9 @@ var g = {
 
 		GM_addStyle("div.ex { clear: none; position: absolute; cursor: pointer; background: transparent url("+ g.roundClose +") 0 0 no-repeat; height: 16px; width: 16px; } ");
 
-		GM_addStyle("span.blLink { color: FireBrick; cursor: pointer; font-size: .75em; } ");
+		GM_addStyle("span.blLink { color: #4272DB; cursor: pointer; } ");
 		GM_addStyle("span.blLink:hover { text-decoration: underline; } ");
-		GM_addStyle("span.blConfirm { color: black; display: none; font-size: .75em; }");
+		GM_addStyle("span.blConfirm { color: black; display: none; }");
 		
         GM_addStyle("span.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
         GM_addStyle("span.blConfirm span.blno { color: #D13B3B; cursor: pointer; }");
@@ -306,7 +306,7 @@ var g = {
 		$('li.g').each(function() {
 			if ($(this).find('span.blLink').length>0) return;
 			if ($(this).find('img#lu_map').length>0) return;
-			$(this).find('cite:last').after('<span class="gl">\u00a0<span class="blLink">Blacklist\u00a0Domain</span><span class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></span></span>');
+			$(this).append('<div><span class="gl"><span class="blLink">Blacklist Domain</span><span class="blConfirm">Confirm: <span class="blyes">Yes</span> / <span class="blno">No</span></span></span><div>');
 		});
 	},
 	blacklistThisDomain: function() {
