@@ -98,8 +98,6 @@ var g = {
 		
 		
 		if (g.prefs.blEnable===true) {
-			g.addBlackListLinks();
-			g.hideResults();
 			g.pollBodyHeight();
 		}
 		
@@ -123,7 +121,7 @@ var g = {
 			g.addBlackListLinks();
 			g.hideResults();
 			$('div#search').live('DOMSubtreeModified',g.pollBodyHeight);
-		},1000);
+		},750);
 		
 
 	},
