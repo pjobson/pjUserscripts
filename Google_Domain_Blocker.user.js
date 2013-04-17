@@ -156,12 +156,7 @@ var g = {
 		
 	eventListeners: function() {
 		// SERP item mouse over
-		$('div#res ol#rso li.g').live('mouseover',function(ev) {
-			if ($(this).find('.blLink').length > 0) return;
-
-			$(this).find('span.gl').append(' - <span class="blLink">Blacklist\u00a0Domain</span><span class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></span>')
-
-		});
+		$('div#res ol#rso li.g').live('mouseover',g.serpMouseOver);
 
 		// Show/Hide Blacklist Buttons
 		$('div#blClose').live('click',g.showHideBlacklist);
@@ -416,6 +411,10 @@ var g = {
 				$('ul#blacklist').append('<li class="domainEntry"><div class="ex"></div><span class="domain">'+ key +'</span></li>');
 			});
 		}
+	},
+	serpMouseOver: function() {
+			if ($(this).find('.blLink').length > 0) return;
+			$(this).find('span.gl').append(' - <span class="blLink">Blacklist\u00a0Domain</span><span class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></span>');
 	},
 	showHideBlacklist: function() {
 		$('div#blTop').toggle();
