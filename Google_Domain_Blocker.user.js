@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2013.01.08
+// @version        2013.04.17
 // @include        *://*.google.*/*
 // @exclude        *://*.google.*/*&tbs=shop*
 // @exclude        *://*.google.*/*tbm=isch*
@@ -82,8 +82,7 @@ var g = {
 	blacklist: [],
 	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
 	init: function() {
-		// Possibly addresses a bug where the blacklist was duping
-		if ($('#showHideBlacklist').length>0) return;		
+
 		g.loadPrefs();
 		g.eventListeners();
 		g.addStyles();
@@ -98,34 +97,12 @@ var g = {
 		
 		
 		if (g.prefs.blEnable===true) {
-			g.addBlackListLinks();
 			g.hideResults();
-			g.pollBodyHeight();
 		}
 		
 		if (g.prefs.blDisplay===false) {
 			GM_addStyle('div#ires ol li.hidtxt { display: none; }');
 		}
-	},
-	
-	pollBodyHeight: function() {
-		// Disable checking until page is settled.
-		$('div#search').die('DOMSubtreeModified',g.pollBodyHeight);
-		
-		// If the blacklist toggle has been kicked out, add it back in and hide the blacklist
-		// Edge case, not sure why it gets kicked out sometimes.
-		if ($('#showHideBlacklist').length==0) {
-			g.addBlacklistToggle();
-			$('div#blTop').hide();
-		}
-		
-		window.setTimeout(function() {
-			g.addBlackListLinks();
-			g.hideResults();
-			$('div#search').live('DOMSubtreeModified',g.pollBodyHeight);
-		},1000);
-		
-
 	},
 	
 	loadPrefs: function() {
@@ -178,8 +155,15 @@ var g = {
 	},
 		
 	eventListeners: function() {
+		// SERP item mouse over
+		$('div#res ol#rso li.g').live('mouseover',function(ev) {
+			if ($(this).find('.blLink').length > 0) return;
+
+			$(this).find('span.gl').append(' - <span class="blLink">Blacklist\u00a0Domain</span><span class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></span>')
+
+		});
+
 		// Show/Hide Blacklist Buttons
-		$('#showHideBlacklist').live('click',g.showHideBlacklist);
 		$('div#blClose').live('click',g.showHideBlacklist);
 		
 		// Blacklisting Link
@@ -201,39 +185,38 @@ var g = {
 		$('button#blExport').live('click',g.export);
 		
 		// Malware on/off button
-		$('li#blMalware').live('click',g.hideResults)
-
+		$('li#blMalware').live('click',g.hideResults);
 	},
 	
 	addStyles: function() {
-		// Adds styles to the DOM		
+		// Adds styles to the DOM
+		GM_addStyle("div#center_col { width: 600px !important; }");
+		GM_addStyle("div.vspib { right: -10px !important; opacity: 0.5; }");
+
 		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: "+ (g.prefs.blPosition.top) +"px; right: "+ (g.prefs.blPosition.right) +"px; border: 1px solid black; width: 300px; padding: 0;  }");
 
 		GM_addStyle("li.hidtxt { color: gray; font-size: 0.60em; margin: 2px 0; }");
+		GM_addStyle("li.hidtxt span.domain { text-decoration: line-through; }");
+
 		GM_addStyle("li.domainEntry { list-style: none; margin: 2px 0; padding: 1px 0 1px 0; }");
 		GM_addStyle("li.domainEntry span.domain { margin-left: 20px; }");
 
 		GM_addStyle("div.ex { clear: none; position: absolute; cursor: pointer; background: transparent url("+ g.roundClose +") 0 0 no-repeat; height: 16px; width: 16px; } ");
 
-		GM_addStyle("span.blLink { color: FireBrick; cursor: pointer; font-size: .75em; } ");
+		GM_addStyle("span.blLink { color: FireBrick; cursor: pointer; font-size: 0.75em; } ");
 		GM_addStyle("span.blLink:hover { text-decoration: underline; } ");
+
 		GM_addStyle("span.blConfirm { color: black; display: none; font-size: .75em; }");
-		
         GM_addStyle("span.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
         GM_addStyle("span.blConfirm span.blno { color: #D13B3B; cursor: pointer; }");
 		
 		GM_addStyle("div#blULContainer { cursor: default; height: 300px; overflow: auto; margin: 5px; position: relative;z-index: 2; background-color: #fff; }");
 		GM_addStyle("div#blForm { margin-top: 5px; padding: 5px; }");
 
-		GM_addStyle("li.hidtxt span.domain { text-decoration: line-through; }");
 
 		GM_addStyle("div.blText { background-color: white; background-color: #C9D7F1; color: black; padding: 3px; text-align: center; font-weight: bold; cursor: move; -moz-user-select: none; }");
 		GM_addStyle("div#blClose { position: absolute; height: 16px; width: 16px; top: 2px; right: 3px; cursor: pointer; background: transparent url("+ g.squareClose +") 0 0 no-repeat; }");
 		
-		
-		
-		GM_addStyle("#showHideBlacklist { font-size: 12px; color: black; background-color: white; position: absolute; top: 25px; right: 3px; z-index: 999; border: 1px solid black; padding: 3px; }");
-
 		GM_addStyle("input#blAddBox { width: 180px; }");
 		GM_addStyle("input#blAddBtn { width: 40px; }");
 		GM_addStyle("div#blPrefContainer { cursor: default; background-color: white; margin: 5px; z-index: 2; }");
@@ -302,14 +285,6 @@ var g = {
 
 		g.addToBlackList($('input#blAddBox').attr('value'));
 		$('input#blAddBox').attr('value','');
-	},
-	addBlackListLinks: function() {
-		// Adds blacklist & confirm links to each SERP
-		$('li.g').each(function() {
-			if ($(this).find('span.blLink').length>0) return;
-			if ($(this).find('img#lu_map').length>0) return;
-			$(this).find('cite:last').after('<span class="gl">\u00a0<span class="blLink">Blacklist\u00a0Domain</span><span class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></span></span>');
-		});
 	},
 	blacklistThisDomain: function() {
 		// Blacklist this domain, show the confirmation
@@ -389,19 +364,12 @@ var g = {
 		$('li.hidtxt').remove();
 		$('li.g').show();
 	},
-	addBlacklistToggle: function() {
-		$('body').prepend('<div class="showBL gbgt" id="showHideBlacklist">Show Blacklist</div>');
-	},
 	makeBlacklistControls: function() {
 		// Makes the controls for this script
 		
 		// Adds an option to show the blacklist into the greasemonkey menu
-		GM_registerMenuCommand("Show Google Blacklist",g.showHideBlacklist);
+		GM_registerMenuCommand("Toggle Google Blacklist",g.showHideBlacklist);
 		
-
-		// This is moved to its own function, due to issues with google instant search.
-		g.addBlacklistToggle();
-
 		$('body').append('<div id="blTop"><div class="blText">Your Blacklist<div id="blClose"></div></div><div id="blULContainer"><ul id="blacklist"></ul></div><div id="blForm"></div></div>');
 				
 		$('div#blForm').append('<input type="text" id="blAddBox" /><input type="button" value="add" id="blAddBtn" />');
@@ -450,16 +418,7 @@ var g = {
 		}
 	},
 	showHideBlacklist: function() {
-		// Shows or hides the blacklist drop menu
-		if (/Show/.test($('#showHideBlacklist').text())) {
-			// show the blacklist
-			$('#showHideBlacklist').html('Hide Blacklist');
-			$('div#blTop').show();
-		} else {
-			// hide the blacklist
-			$('#showHideBlacklist').html('Show Blacklist');
-			$('div#blTop').hide();
-		}
+		$('div#blTop').toggle();
 	},
 
 	// Image from: http://www.webstuffshare.com/2010/03/stylize-your-own-checkboxes/
