@@ -31,7 +31,7 @@ I tried to make blacklisting of domains as straight forward as possible.  Move y
 
 ![Result Blacklisted](http://jobson.us/github/pjUserscripts/screen_shots/gdb-serp_04-blacklisted_result.png)
 
-#### Blacklist Preferences
+#### Your Blacklist
 
 You may view the blacklist preferences through the menu or the greasemonkey icon.  Selecting either of these brings up "Your Blacklist".
 
@@ -43,6 +43,26 @@ You may view the blacklist preferences through the menu or the greasemonkey icon
 
 ![Your Blacklist](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist.png)
 
+##### Preferences
+
+There are four prefereces you can set:
+
+* Blacklist Enabled
+** Toggles the script.
+* Display Messages
+** Shows "domain blacklisted" in SERP.
+* RegEx Blocker
+** Uses regular expressions to block domain names.
+* Auto Block Malware
+** Automatically blocks domains marked by Google as Malware.
+
+![Preferences](http://jobson.us/github/pjUserscripts/screen_shots/gdb-preferences.png)
+
+##### Import/Export
+
+Allows you to import or export your full blacklist in JSON format.
+
+![Import/Export](http://jobson.us/github/pjUserscripts/screen_shots/gdb-import_export.png)
 
 ## Gun_Shop_OOS_Hider.user.js
 
