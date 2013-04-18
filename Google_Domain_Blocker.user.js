@@ -14,6 +14,8 @@
 // @grant          GM_registerMenuCommand
 // ==/UserScript==
 
+var console = console || $.noop;
+
 var g = {
 	url: 'http://userscripts.org/scripts/show/33156',
 	timeout: null,
@@ -256,7 +258,7 @@ var g = {
 						tld = this.toString();
 					}
 				});
-				domain = '/([a-z0-9\\.]+)*\\.'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				domain = '/([a-z0-9\\.]+)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
 			}
 						
 			domain = $.trim(domain);
