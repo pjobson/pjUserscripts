@@ -281,8 +281,20 @@ var g = {
 		// Hide the results using the blacklist.
 		$('li.g cite').each(function() {
 			var domain = $(this).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
-			
 			var cite = this;
+
+			// Malware check based on blMalware pref.
+			if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
+				g.hideThis(cite,'malware');
+				return;
+			}
+
+			// News Display Check based on blNews pref
+			if (g.prefs.blNews === true && $(this).parents('li.g').attr('id') === 'newsbox') {
+				g.hideThis(cite,'news');
+				return;
+			}
+
 			var h = false;
 			$.each(g.blacklist,function(i,key) {
 				if (/^\/.+\/$/.test(key)) {
@@ -296,28 +308,22 @@ var g = {
 				}
 			});
 
-			// News Display Check based on blNews pref
-			if (g.prefs.blNews === true && $(this).parents('li.g').attr('id') === 'newsbox') {
-				h = true;
-			}
-
-
-			// Malware check based on blMalware pref.
-			if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
-				h = true;
-			}
-
 			// If hide is true hide this item.
 			if (h===true) {
-				if ($(cite).parents('li.g').prev().hasClass('hidtxt')) {
-					// Return if this domain is already blocked
-					return;
-				} else {
-					$(cite).parents('li.g').before(g.hiddenText.replace(/xxx/,domain));
-					$(cite).parents('li.g').hide();				
-				}
+				g.hideThis(cite,domain);
 			}
 		});
+	},
+	hideThis: function(cite,domain) {
+		domain = domain || '';
+		if ($(cite).parents('li.g').prev().hasClass('hidtxt')) {
+			// Return if this domain is already blocked
+			return;
+		} else {
+			$(cite).parents('li.g').before(g.hiddenText.replace(/xxx/,domain));
+			$(cite).parents('li.g').hide();				
+		}
+
 	},
 	showResults: function() {
 		// Shows all results
