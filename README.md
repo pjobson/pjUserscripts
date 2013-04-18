@@ -48,13 +48,13 @@ You may view the blacklist preferences through the menu or the greasemonkey icon
 There are four prefereces you can set:
 
 * Blacklist Enabled
-** Toggles the script.
+  * Toggles the script.
 * Display Messages
-** Shows "domain blacklisted" in SERP.
+  * Shows "domain blacklisted" in SERP.
 * RegEx Blocker
-** Uses regular expressions to block domain names.
+  * Uses regular expressions to block domain names.
 * Auto Block Malware
-** Automatically blocks domains marked by Google as Malware.
+  * Automatically blocks domains marked by Google as Malware.
 
 ![Preferences](http://jobson.us/github/pjUserscripts/screen_shots/gdb-preferences.png)
 
