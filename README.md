@@ -15,19 +15,19 @@ How many times do you search Google and find junk results from search engine spa
 
 I tried to make blacklisting of domains as straight forward as possible.  Move your cursor over any of the results and you'll see "Blacklist Domain" appear in the left hand side.  Click "Blacklist Domain" and a confirmation will appear, select Yes or No to confirm.
 
-** Basic SERP **
+**Basic SERP**
 
 ![Basic SERP](http://jobson.us/github/pjUserscripts/screen_shots/gdb-serp_01-plain.png)
 
-** Mouse Over SERP **
+**Mouse Over SERP**
 
 ![Mouse Over SERP](http://jobson.us/github/pjUserscripts/screen_shots/gdb-serp_02-blacklist_domain.png)
 
-** Blacklist Confirmation **
+**Blacklist Confirmation**
 
 ![Blacklist Confirmation](http://jobson.us/github/pjUserscripts/screen_shots/gdb-serp_03-confirmation.png)
 
-** Result Blacklisted **
+**Result Blacklisted**
 
 ![Result Blacklisted](http://jobson.us/github/pjUserscripts/screen_shots/gdb-serp_04-blacklisted_result.png)
 
