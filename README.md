@@ -21,11 +21,10 @@ You may view the blacklist preferences through the menu or the greasemonkey icon
 
 Selecting either of those brings up "Your Blacklist".
 
-Initial View
-![Blacklist Empty](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist_empty.png)
+**Your Blacklist Empty and Populated**
 
-Populated View
-![Blacklist Full](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist_full.png)
+![Your Blacklist](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist.png)
+
 
 
 
