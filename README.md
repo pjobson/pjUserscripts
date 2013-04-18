@@ -17,8 +17,8 @@ How many times do you search Google and find junk results from search engine spa
 
 You may view the blacklist preferences through the menu or the greasemonkey icon.  
 
-![GreaseMonkey User Script Command](https://github.com/pjobson/pjUserscripts/blob/master/screen_shots/gdb-gm_icon_user_script_command.png)
-![GreaseMonkey Menu Command](https://github.com/pjobson/pjUserscripts/blob/master/screen_shots/gdb-menu_user_script_command.png)
+![GreaseMonkey User Script Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-gm_icon_user_script_command.png)
+![GreaseMonkey Menu Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-menu_user_script_command.png)
 
 
 
