@@ -62,6 +62,8 @@ There are four prefereces you can set:
   * Uses regular expressions to block domain names.
 * Auto Block Malware
   * Automatically blocks domains marked by Google as Malware.
+* Blacklist News
+  * Hides the google news widget.
 
 ![Preferences](http://jobson.us/github/pjUserscripts/screen_shots/gdb-preferences.png)
 
