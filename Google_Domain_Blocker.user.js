@@ -43,7 +43,7 @@ var g = {
 //		Debug: always show the list
 //		$('div#blTop').show();
 //		Debug: Empty Blacklist
-		GM_setValue('blacklist','');
+//		GM_setValue('blacklist','');
 		
 		
 		if (g.prefs.blEnable===true) {
