@@ -1,10 +1,8 @@
 # pjUserscripts
 
-
 My userscripts mostly migrated from userscripts.org
 
 ## Google_Domain_Blocker.user.js
-
 Blocks junk domains from google.com SERP.
 
 Originally: https://userscripts.org/scripts/show/33156
@@ -17,8 +15,17 @@ How many times do you search Google and find junk results from search engine spa
 
 You may view the blacklist preferences through the menu or the greasemonkey icon.  
 
-![GreaseMonkey User Script Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-gm_icon_user_script_command.png)
 ![GreaseMonkey Menu Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-menu_user_script_command.png)
+
+![GreaseMonkey User Script Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-gm_icon_user_script_command.png)
+
+Selecting either of those brings up "Your Blacklist".
+
+Initial View
+![Blacklist Empty](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist_empty.png)
+
+Populated View
+![Blacklist Full](http://jobson.us/github/pjUserscripts/screen_shots/gdb-your_blacklist_full.png)
 
 
 
