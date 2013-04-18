@@ -17,13 +17,13 @@
 var console = console || $.noop;
 
 var g = {
-	url: 'http://userscripts.org/scripts/show/33156',
 	timeout: null,
 	prefs: {
 		blEnable: true,
 		blDisplay: true,
 		blRegex: false,
 		blMalware: true,
+		blNews: false,
 		blPosition: {
 			right: 5,
 			top: ($('#mngb').height()+2)
@@ -43,7 +43,7 @@ var g = {
 //		Debug: always show the list
 //		$('div#blTop').show();
 //		Debug: Empty Blacklist
-//		GM_setValue('blacklist','');
+		GM_setValue('blacklist','');
 		
 		
 		if (g.prefs.blEnable===true) {
@@ -61,12 +61,14 @@ var g = {
 //		GM_deleteValue('blRegex');
 //		GM_deleteValue('blDisplay');
 //		GM_deleteValue('blMalware');
-		
+//		GM_deleteValue('blNews');
+
 		// If pref is undefined, set it as default otherwise use the set value
 		g.prefs.blEnable 	= (GM_getValue('blEnable')  == undefined) ? g.prefs.blEnable  : GM_getValue('blEnable');
 		g.prefs.blDisplay 	= (GM_getValue('blDisplay') == undefined) ? g.prefs.blDisplay : GM_getValue('blDisplay');
 		g.prefs.blRegex 	= (GM_getValue('blRegex')   == undefined) ? g.prefs.blRegex   : GM_getValue('blRegex');
 		g.prefs.blMalware	= (GM_getValue('blMalware') == undefined) ? g.prefs.blMalware : GM_getValue('blMalware');
+		g.prefs.blNews		= (GM_getValue('blNews')    == undefined) ? g.prefs.blNews    : GM_getValue('blNews');
 	},
 	
 	togglePref: function(ev) {
@@ -131,6 +133,7 @@ var g = {
 		
 		// Malware on/off button
 		$('li#blMalware').live('click',g.hideResults);
+
 	},
 	
 	addStyles: function() {
@@ -293,6 +296,12 @@ var g = {
 				}
 			});
 
+			// News Display Check based on blNews pref
+			if (g.prefs.blNews === true && $(this).parents('li.g').attr('id') === 'newsbox') {
+				h = true;
+			}
+
+
 			// Malware check based on blMalware pref.
 			if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
 				h = true;
@@ -336,6 +345,7 @@ var g = {
 		$('#blPrefList').append('<li id="blDisplay">Display Messages'+ prefTxt +'<br/><span class="blDesc">Shows "<span class="domain">domain</span> blacklisted" in SERP.</span></li>');
 		$('#blPrefList').append('<li id="blRegex">RegEx Blocker'+ prefTxt +'<br/><span class="blDesc">Use regex to block full domain name.</span></li>');
 		$('#blPrefList').append('<li id="blMalware">Auto Block Malware'+ prefTxt +'<br/><span class="blDesc">Auto-block sites listed as malware.</span></li>');
+		$('#blPrefList').append('<li id="blNews">Blacklist News'+ prefTxt +'<br/><span class="blDesc">Blacklists google news widget.</span></li>');
 				
 		$.each(g.prefs, function(id) {
 			if (this==false) {
@@ -370,6 +380,7 @@ var g = {
 	},
 	serpMouseOver: function() {
 			if ($(this).find('.blLink').length > 0) return;
+			if ($(this).attr('id')) return;
 			$(this).append('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>');
 	},
 	showHideBlacklist: function() {
