@@ -2,6 +2,13 @@
 
 My userscripts mostly migrated from userscripts.org
 
+## Installation
+
+* Install GreaseMonkey - https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
+* Install the scripts with either of these:
+  * Clone the repo and drag the .js files into your browser.
+  * Click the script you want to install, click on "RAW", select INSTALL from the dialog box.
+
 ## Google_Domain_Blocker.user.js
 Blocks junk domains from google.com SERP.
 
