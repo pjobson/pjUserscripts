@@ -43,7 +43,7 @@ var g = {
 		setTimeout(g.hideResults,1000);
 
 //		Debug: always show the list
-		$('div#blTop').show();
+//		$('div#blTop').show();
 //		Debug: Empty Blacklist
 //		GM_setValue('blacklist','');
 		
