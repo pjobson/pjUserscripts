@@ -24,6 +24,7 @@ var g = {
 		blRegex: false,
 		blMalware: true,
 		blNews: false,
+		blRelated: false,
 		blPosition: {
 			right: 5,
 			top: ($('#mngb').height()+2)
@@ -32,7 +33,6 @@ var g = {
 	blacklist: [],
 	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
 	init: function() {
-
 		g.loadPrefs();
 		g.eventListeners();
 		g.addStyles();
@@ -40,8 +40,10 @@ var g = {
 		g.makeBlacklistControls();
 		g.searchDIV;
 
+		setTimeout(g.hideResults,1000);
+
 //		Debug: always show the list
-//		$('div#blTop').show();
+		$('div#blTop').show();
 //		Debug: Empty Blacklist
 //		GM_setValue('blacklist','');
 		
@@ -62,6 +64,7 @@ var g = {
 //		GM_deleteValue('blDisplay');
 //		GM_deleteValue('blMalware');
 //		GM_deleteValue('blNews');
+
 
 		// If pref is undefined, set it as default otherwise use the set value
 		g.prefs.blEnable 	= (GM_getValue('blEnable')  == undefined) ? g.prefs.blEnable  : GM_getValue('blEnable');
@@ -107,6 +110,11 @@ var g = {
 	},
 		
 	eventListeners: function() {
+		// OnHashChange hide results
+		$(window).hashchange(function() {
+			setTimeout(g.hideResults,1000);
+		});
+
 		// SERP item mouse over
 		$('div#res ol#rso li.g').live('mouseover',g.serpMouseOver);
 
@@ -279,9 +287,13 @@ var g = {
 	},
 	hideResults: function() {
 		// Hide the results using the blacklist.
-		$('li.g cite').each(function() {
-			var domain = $(this).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
-			var cite = this;
+		$('li.g').each(function() {
+			// Old results
+			if ($(this).is(":visible") === false) {
+				return;
+			}
+			var cite = $(this).find('cite');
+			var domain = $(cite).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
 
 			// Malware check based on blMalware pref.
 			if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
@@ -387,6 +399,8 @@ var g = {
 	serpMouseOver: function() {
 			if ($(this).find('.blLink').length > 0) return;
 			if ($(this).attr('id')) return;
+			if ($(this).siblings().height() > ($(this).height() * 3)) return;
+
 			$(this).append('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>');
 	},
 	showHideBlacklist: function() {
@@ -467,3 +481,13 @@ text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function
 ('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}
 if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}
 throw new SyntaxError('JSON.parse');};}}());
+
+/*
+ * jQuery hashchange event - v1.3 - 7/21/2010
+ * http://benalman.com/projects/jquery-hashchange-plugin/
+ * 
+ * Copyright (c) 2010 "Cowboy" Ben Alman
+ * Dual licensed under the MIT and GPL licenses.
+ * http://benalman.com/about/license/
+ */
+(function($,e,b){var c="hashchange",h=document,f,g=$.event.special,i=h.documentMode,d="on"+c in e&&(i===b||i>7);function a(j){j=j||location.href;return"#"+j.replace(/^[^#]*#?(.*)$/,"$1")}$.fn[c]=function(j){return j?this.bind(c,j):this.trigger(c)};$.fn[c].delay=50;g[c]=$.extend(g[c],{setup:function(){if(d){return false}$(f.start)},teardown:function(){if(d){return false}$(f.stop)}});f=(function(){var j={},p,m=a(),k=function(q){return q},l=k,o=k;j.start=function(){p||n()};j.stop=function(){p&&clearTimeout(p);p=b};function n(){var r=a(),q=o(m);if(r!==m){l(m=r,q);$(e).trigger(c)}else{if(q!==m){location.href=location.href.replace(/#.*/,"")+q}}p=setTimeout(n,$.fn[c].delay)}$.browser.msie&&!d&&(function(){var q,r;j.start=function(){if(!q){r=$.fn[c].src;r=r&&r+a();q=$('<iframe tabindex="-1" title="empty"/>').hide().one("load",function(){r||l(a());n()}).attr("src",r||"javascript:0").insertAfter("body")[0].contentWindow;h.onpropertychange=function(){try{if(event.propertyName==="title"){q.document.title=h.title}}catch(s){}}}};j.stop=k;o=function(){return a(q.location.href)};l=function(v,s){var u=q.document,t=$.fn[c].domain;if(v!==s){u.title=h.title;u.open();t&&u.write('<script>document.domain="'+t+'"<\/script>');u.close();q.location.hash=v}}})();return j})()})(jQuery,this);
