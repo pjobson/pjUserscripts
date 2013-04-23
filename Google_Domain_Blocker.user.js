@@ -4,8 +4,9 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2013.04.17
+// @version        2013.04.23
 // @include        *://*.google.*/*
+// @exclude        *tbm=shop*
 // @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
 // @grant          GM_addStyle
 // @grant          GM_deleteValue
