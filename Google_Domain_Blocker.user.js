@@ -40,6 +40,7 @@ var g = {
 		g.blacklist = g.getBlacklist();
 		g.makeBlacklistControls();
 		g.searchDIV;
+		g.urlUnFuck();
 
 		setTimeout(g.hideResults,1000);
 
@@ -290,9 +291,11 @@ var g = {
 		// Hide the results using the blacklist.
 		$('li.g').each(function() {
 			// Old results
-			if ($(this).is(":visible") === false) {
-				return;
-			}
+			if ($(this).is(":visible") === false) return;
+			
+			if ($(this).hasClass('psli') === true) return;
+
+
 			var cite = $(this).find('cite');
 			var domain = $(cite).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
 
@@ -384,6 +387,12 @@ var g = {
 		$('div#blTop').hide();
 				
 		g.buildList();
+	},
+	urlUnFuck: function() {
+		$('a[onmousedown]').each(function(){
+			if (/return rwt/.test($(this).attr('onmousedown').toSource()) === false) return;
+			$(this).replaceWith($('<a href="'+ $(this).attr('href') +'">'+ $(this).html() +'</a>'));
+		});
 	},
 	buildList: function() {
 		$('li.domainEntry').remove();
