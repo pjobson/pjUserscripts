@@ -306,7 +306,7 @@ var g = {
 			}
 
 			// News Display Check based on blNews pref
-			if (g.prefs.blNews === true && $(this).parents('li.g').attr('id') === 'newsbox') {
+			if (g.prefs.blNews === true && ($(this).parents('li.g').attr('id') === 'newsbox' || $(this).attr('id') === 'newsbox')) {
 				g.hideThis(cite,'news');
 				return;
 			}
