@@ -16,6 +16,12 @@ Originally: https://userscripts.org/scripts/show/33156
 
 How many times do you search Google and find junk results from search engine spam sites? Then you find them again and again. Well I got pretty sick of it, so I created this userscript.
 
+### Files
+
+**Google_Domain_Blocker.importList.personal.json** - My personal blacklist, this list is pretty aggressive and probably shouldn't be used by most users.
+
+**Google_Domain_Blocker.importList.sample.json** - Example blacklist blocking amazon, facebook, w3cschools, and yelp.
+
 ### Features
 
 #### Blacklisting Domains
