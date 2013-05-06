@@ -82,3 +82,7 @@ Allows you to import or export your full blacklist in JSON format.
 ## Gun_Shop_OOS_Hider.user.js
 
 This is a work in progress to modifiy the results from various gun shops. 
+
+## TheTVDB_Hide_Non-English.user.js
+
+Simply hides non-English results from TheTVDB's result list.
