@@ -148,7 +148,6 @@ var g = {
 	
 	addStyles: function() {
 		// Adds styles to the DOM
-		GM_addStyle("div#center_col { width: 600px !important; }");
 		GM_addStyle("div.vspib { right: -10px !important; opacity: 0.5; }");
 
 		GM_addStyle("div#blTop { background-color: white; z-index: 999; position: absolute; top: "+ (g.prefs.blPosition.top) +"px; right: "+ (g.prefs.blPosition.right) +"px; border: 1px solid black; width: 300px; padding: 0;  }");
@@ -409,10 +408,8 @@ var g = {
 	serpMouseOver: function() {
 			if ($(this).find('.blLink').length > 0) return;
 			if ($(this).attr('id')) return;
-			// Dictionary Result
-			if ($(this).find('.dict').length > 0) return;
-
 			if ($(this).siblings().height() > ($(this).height() * 3)) return;
+			if ($(this).find('.vspib').length > 0) return;
 
 			$(this).append('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>');
 	},
