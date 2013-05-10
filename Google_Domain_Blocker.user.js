@@ -409,6 +409,9 @@ var g = {
 	serpMouseOver: function() {
 			if ($(this).find('.blLink').length > 0) return;
 			if ($(this).attr('id')) return;
+			// Dictionary Result
+			if ($(this).find('.dict').length > 0) return;
+
 			if ($(this).siblings().height() > ($(this).height() * 3)) return;
 
 			$(this).append('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>');
