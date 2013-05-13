@@ -86,3 +86,7 @@ This is a work in progress to modifiy the results from various gun shops.
 ## TheTVDB_Hide_Non-English.user.js
 
 Simply hides non-English results from TheTVDB's result list.
+
+## Craigslist_Image_Viewer.user.js
+
+Automatically shows all images in search results in Craigslist, I like using this more than the default functionality that CL offers.
