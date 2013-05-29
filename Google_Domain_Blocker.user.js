@@ -3,29 +3,39 @@
 // @namespace      http://jobson.us
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
-// @downloadURL    http://userscripts.org/scripts/source/33156.user.js
-// @version        2013.04.23
+// @downloadURL    https://github.com/pjobson/pjUserscripts/raw/master/Google_Domain_Blocker.user.js
+// @version        2013.05.15
 // @include        *://*.google.*/*
 // @exclude        *tbm=shop*
-// @require        https://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js
+// @exclude        *://plus.*
+// @require        http://code.jquery.com/jquery-latest.min.js
 // @grant          GM_addStyle
 // @grant          GM_deleteValue
 // @grant          GM_getValue
 // @grant          GM_setValue
 // @grant          GM_registerMenuCommand
+// @grant          GM_xmlhttpRequest
 // ==/UserScript==
 
 var console = console || $.noop;
 
 var g = {
-	timeout: null,
+	mobserver: null,
+	update: {
+		localVer: GM_info.script.version,
+		remoteVer: null,
+		downloadURL: GM_info.scriptMetaStr.match(/.+@downloadURL\s+(.+)/)[1],
+		lastCheck: 0,
+		now: new Date().getTime()
+	},
 	prefs: {
-		blEnable: true,
-		blDisplay: true,
-		blRegex: false,
-		blMalware: true,
-		blNews: false,
-		blRelated: false,
+		blEnable:      true,
+		blDisplay:     true,
+		blRegex:       false,
+		blMalware:     true,
+		blNews:        false,
+		blRelated:     false,
+		blPrefShow:    false,
 		blPosition: {
 			right: 5,
 			top: ($('#mngb').height()+2)
@@ -34,6 +44,7 @@ var g = {
 	blacklist: [],
 	hiddenText: '<li class="hidtxt"><span class="domain">xxx</span> blacklisted</li>',
 	init: function() {
+		g.checkForUpdate();
 		g.loadPrefs();
 		g.eventListeners();
 		g.addStyles();
@@ -42,23 +53,283 @@ var g = {
 		g.searchDIV;
 		g.urlUnFuck();
 
-		setTimeout(g.hideResults,1000);
-
-//		Debug: always show the list
-//		$('div#blTop').show();
+		if (g.prefs.blPrefShow===true) {
+			$('div#blTop').show();
+		}
 //		Debug: Empty Blacklist
 //		GM_setValue('blacklist','');
 		
-		
 		if (g.prefs.blEnable===true) {
-			g.hideResults();
+			g.mutationObservation();
+			//setTimeout(g.events.hideResults,1000);
 		}
 		
 		if (g.prefs.blDisplay===false) {
 			GM_addStyle('div#ires ol li.hidtxt { display: none; }');
 		}
 	},
-	
+
+	mutationObservation: function() {
+		g.mobserver = new MutationObserver(function(mutations) {
+			//console.log(mutations);
+			g.events.hideResults();
+			g.mobserver.disconnect();
+		});
+
+		var config = { attributes: false, childList: true, characterData: true, subtree: true };
+
+		g.mobserver.observe(document.querySelector('body'),config);
+	},
+
+	checkForUpdate: function() {
+		g.update.remoteVer = GM_getValue('remoteVer') || g.update.localVer;
+		g.update.lastCheck = parseInt(GM_getValue('lastCheck'),10) || 0;
+
+		if (g.update.now - g.update.lastCheck > 1296000000) {
+			// Last update older than 15 days
+			// 1296000000 = 15 days in ms
+			GM_xmlhttpRequest({
+				method: "GET",
+				url: g.update.downloadURL,
+				onload: function(response) {
+					g.update.remoteVer = response.responseText.match(/@version\s+(.+)/)[1];
+					g.update.lastCheck = g.update.now;
+					GM_setValue('remoteVer',g.update.remoteVer);
+					GM_setValue('lastCheck',g.update.lastCheck.toString());
+					g.checkForUpdate();
+				}
+			});
+
+			return;
+		} else if (g.update.remoteVer !== g.update.localVer) {
+			// remote different from local
+			var tmp,remoteVerDate,localVerDate;
+			
+			tmp = g.update.remoteVer.split('.');
+			remoteVerDate = new Date(tmp[0],tmp[1],tmp[2]).getTime();
+			tmp = g.update.localVer.split('.');
+			localVerDate = new Date(tmp[0],tmp[1],tmp[2]).getTime();
+
+			if (localVerDate < remoteVerDate) {
+				// Local version is older than remote version prompt for get new version
+				$('#gbx3').append('<div id="blUpdateMe"><strong>'+ GM_info.script.name +'</strong> Update Available<div>');
+				$('#blUpdateMe').on('click',function() {
+					window.location.href = g.update.downloadURL;
+				});
+
+			}
+			return;
+		}
+	},
+
+	events: {
+		hideResults: function() {
+			if (g.prefs.blRelated) {
+				$('div#extrares').replaceWith(g.hiddenText.replace(/xxx/,'related'))
+			}
+			// Hide the results using the blacklist.
+			$('li.g').each(function() {
+				// Old results
+				if ($(this).is(":visible") === false) return;
+				
+				if ($(this).hasClass('psli') === true) return;
+
+
+				var cite = $(this).find('cite');
+				var domain = $(cite).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
+
+				// Malware check based on blMalware pref.
+				if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
+					g.events.hideThis(cite,'malware');
+					return;
+				}
+
+				// News Display Check based on blNews pref
+				if (g.prefs.blNews === true && ($(this).parents('li.g').attr('id') === 'newsbox' || $(this).attr('id') === 'newsbox')) {
+					g.events.hideThis(cite,'news');
+					return;
+				}
+
+				var h = false;
+				$.each(g.blacklist,function(i,key) {
+					if (/^\/.+\/$/.test(key)) {
+						// Regular expression
+						var re = new RegExp(key.replace(/\//g,''),'i');
+						if (re.test(domain)) {
+							h = true;
+						}
+					} else if (key.toLowerCase() === domain.toLowerCase()) {
+						h = true;
+					}
+				});
+
+				// If hide is true hide this item.
+				if (h===true) {
+					g.events.hideThis(cite,domain);
+				}
+			});
+			$('div#res ol#rso li.g').on('mouseenter',g.events.serpMouseOver);
+		},
+
+		serpMouseOver: function() {
+			if ($(this).find('.blLink').length > 0) return;
+			if ($(this).attr('id')) return;
+			if ($(this).siblings().height() > ($(this).height() * 3)) return;
+			if ($(this).find('.vspib').length > 0) return;
+			if ($(this).hasClass('obcontainer')) return;
+
+			$(this).append($('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>').on('click',g.events.blacklistThisDomain));
+		},
+
+		showHideBlacklist: function() {
+			$('div#blTop').toggle();
+		},
+
+		blacklistThisDomain: function() {
+			// Blacklist this domain, show the confirmation
+			$(this).parents('li.g').find('div.cover').remove();
+
+			$(this).parents('li').append(
+				$('<div class="cover"><div class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></div></div>').height($(this).parents('li').height()).width($(this).parents('li').width())
+			);
+			$('span.blyes,span.blno').on('click',g.events.confirmation);
+		},
+
+		confirmation: function() {
+			// Shows confirmation for adding a domain to the list
+			if ($(this).hasClass('blyes')) {
+				var domain = $(this).parents('li.g').find('cite:first').text().replace(/^https:\/\//,'').replace(/[\/\s].+/,'').replace(/\/$/,'');
+							
+				if (g.prefs.blRegex===true) {
+					var tld = '';
+					var re;
+					$.each(g.tld,function() {
+						if (tld!='') return;
+						re = new RegExp('(.+)'+ this.replace(/\./g,'\\.') +'$','i');
+						if(re.test(domain)) {
+							tld = this.toString();
+						}
+					});
+					domain = '/([a-z0-9\\.]+)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
+				}
+							
+				domain = $.trim(domain);
+				g.events.addToBlackList(domain);
+			}
+
+			$(this).parents('div.cover').remove();
+		},
+
+		manualAdd: function(ev) {
+			// manually add a domain to the blacklist
+			if ($('input#blAddBox').val() === '') return;
+			
+			// I'm lazy, so I'm using the same function for keypress and a click
+			if(ev.keyCode != 13 && $(this).attr('id')== 'blAddBox') return;
+
+			g.events.addToBlackList($('input#blAddBox').val());
+			$('input#blAddBox').val('');
+		},
+
+		removeFromBlackList: function() {
+			// Removes an entry from the blacklist
+			var domain = $(this).parent().find('span.domain').text();
+			g.blacklist = g.blacklist.remove(domain);
+			g.events.saveBlacklist();
+			// Show the results first, stop duplication errors.
+			g.events.showResults();
+			g.events.hideResults();
+			g.buildList();
+		},
+
+		togglePref: function(ev) {
+			var pref = $(this).parent().attr('id');
+			if ($(this).hasClass('blOn')) {
+				$(this).removeClass('blOn');
+				$(this).addClass('blOff');
+				g.prefs[pref] = false;
+			} else {
+				$(this).removeClass('blOff');
+				$(this).addClass('blOn');
+				g.prefs[pref] = true;
+			}
+			GM_setValue(pref,g.prefs[pref]);
+			
+			g.events.doPref(pref);
+		},
+
+		doPref: function(pref) {
+			switch (pref) {
+				case 'blEnable':
+					window.location.reload()
+					break;
+				case 'blDisplay':
+					if (g.prefs[pref]===false) {
+						GM_addStyle('div#ires ol li.hidtxt { display: none; }');
+					} else {
+						GM_addStyle('div#ires ol li.hidtxt { display: block; }');
+					}
+					break;
+				case 'blRegex':
+					// Regex only happens when user clicks Blacklist Domain
+					break;
+				default: break;
+			}
+		},
+
+		selectText: function() {
+			// For some reason in GM 0.9.6 an exception is thrown here.
+			try {
+				$('textarea#blPortBox').select();
+			} catch(er) {}
+		},
+		export: function() {
+			$('#blPortBox').val(JSON.stringify(g.blacklist));
+			$('textarea#blPortBox').on('click',g.events.selectText);
+		},
+		import: function() {
+			$('textarea#blPortBox').off('click');
+
+			$.each(JSON.parse($('#blPortBox').val()),function() {
+				g.events.addToBlackList(this.toString());
+			});
+			
+			$('#blPortBox').val('');
+		},
+		saveBlacklist: function() {
+			// Saves g.blacklist to greasemonkey blacklist
+			GM_setValue('blacklist',g.blacklist.join(','));
+		},
+		addToBlackList: function(domain) {
+			// Adds an entry to the blacklist
+			g.blacklist.push(domain);
+			g.blacklist = g.blacklist.uniq().sort();
+//			g.blacklist = $.unique(g.blacklist).sort();
+			g.events.saveBlacklist();
+			// Show the results first, stop duplication errors.
+			g.events.showResults();
+			g.events.hideResults();
+			g.buildList();
+		},
+
+		hideThis: function(cite,domain) {
+			domain = domain || '';
+			if ($(cite).parents('li.g').prev().hasClass('hidtxt')) {
+				// Return if this domain is already blocked
+				return;
+			} else {
+				$(cite).parents('li.g').before(g.hiddenText.replace(/xxx/,domain));
+				$(cite).parents('li.g').hide();				
+			}
+
+		},
+		showResults: function() {
+			// Shows all results
+			$('li.hidtxt').remove();
+			$('li.g').show();
+		}
+	},
+
 	loadPrefs: function() {
 		// Debug: unset all prefs.
 //		GM_deleteValue('blEnable');
@@ -66,84 +337,27 @@ var g = {
 //		GM_deleteValue('blDisplay');
 //		GM_deleteValue('blMalware');
 //		GM_deleteValue('blNews');
-
+//		GM_deleteValue('blRelated');
+//		GM_deleteValue('blPrefShow');
 
 		// If pref is undefined, set it as default otherwise use the set value
-		g.prefs.blEnable 	= (GM_getValue('blEnable')  == undefined) ? g.prefs.blEnable  : GM_getValue('blEnable');
-		g.prefs.blDisplay 	= (GM_getValue('blDisplay') == undefined) ? g.prefs.blDisplay : GM_getValue('blDisplay');
-		g.prefs.blRegex 	= (GM_getValue('blRegex')   == undefined) ? g.prefs.blRegex   : GM_getValue('blRegex');
-		g.prefs.blMalware	= (GM_getValue('blMalware') == undefined) ? g.prefs.blMalware : GM_getValue('blMalware');
-		g.prefs.blNews		= (GM_getValue('blNews')    == undefined) ? g.prefs.blNews    : GM_getValue('blNews');
+		g.prefs.blEnable   = GM_getValue('blEnable')   || g.prefs.blEnable;
+		g.prefs.blDisplay  = GM_getValue('blDisplay')  || g.prefs.blDisplay;
+		g.prefs.blRegex    = GM_getValue('blRegex')    || g.prefs.blRegex;
+		g.prefs.blMalware  = GM_getValue('blMalware')  || g.prefs.blMalware;
+		g.prefs.blNews     = GM_getValue('blNews')     || g.prefs.blNews;
+		g.prefs.blRelated  = GM_getValue('blRelated')  || g.prefs.blRelated;
+		g.prefs.blPrefShow = GM_getValue('blPrefShow') || g.prefs.blPrefShow;
 	},
-	
-	togglePref: function(ev) {
-		var pref = $(this).parent().attr('id');
-		if ($(this).hasClass('blOn')) {
-			$(this).removeClass('blOn');
-			$(this).addClass('blOff');
-			g.prefs[pref] = false;
-		} else {
-			$(this).removeClass('blOff');
-			$(this).addClass('blOn');
-			g.prefs[pref] = true;
-		}
-		GM_setValue(pref,g.prefs[pref]);
-		
-		g.doPref(pref);
-	},
-	
-	doPref: function(pref) {
-		switch (pref) {
-			case 'blEnable':
-				window.location.reload()
-				break;
-			case 'blDisplay':
-				if (g.prefs[pref]===false) {
-					GM_addStyle('div#ires ol li.hidtxt { display: none; }');
-				} else {
-					GM_addStyle('div#ires ol li.hidtxt { display: block; }');
-				}
-				break;
-			case 'blRegex':
-				// Regex only happens when user clicks Blacklist Domain
-				break;
-			default: break;
-		}
-	},
-		
+
 	eventListeners: function() {
 		// OnHashChange hide results
 		$(window).hashchange(function() {
-			setTimeout(g.hideResults,1000);
+			setTimeout(g.events.hideResults,1000);
 		});
 
 		// SERP item mouse over
-		$('div#res ol#rso li.g').live('mouseover',g.serpMouseOver);
-
-		// Show/Hide Blacklist Buttons
-		$('div#blClose').live('click',g.showHideBlacklist);
-		
-		// Blacklisting Link
-		$('span.blLink').live('click',g.blacklistThisDomain);
-		$('span.blyes,span.blno').live('click',g.confirmation);
-		
-		// Add Button
-		$('input#blAddBox').live('keyup',g.manualAdd);
-		$('input#blAddBtn').live('click',g.manualAdd);
-		
-		// Removal X 
-		$('div.ex').live('click',g.removeFromBlackList);
-		
-		// Preference Toggle
-		$('span.blPref').live('click',g.togglePref);
-		
-		// Import/Export Functionality
-		$('button#blImport').live('click',g.import);
-		$('button#blExport').live('click',g.export);
-		
-		// Malware on/off button
-		$('li#blMalware').live('click',g.hideResults);
-
+		$('div#res ol#rso li.g').on('mouseenter',g.events.serpMouseOver);
 	},
 	
 	addStyles: function() {
@@ -193,92 +407,10 @@ var g = {
         GM_addStyle("div.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
         GM_addStyle("div.blConfirm span.blno  { color: #D13B3B; cursor: pointer; }");
 
-	},
-	selectText: function() {
-		// For some reason in GM 0.9.6 an exception is thrown here.
-		try {
-			$('textarea#blPortBox').select();
-		} catch(er) {}
-	},
-	export: function() {
-		$('#blPortBox').val(JSON.stringify(g.blacklist));
-		$('textarea#blPortBox').live('click',g.selectText);
-	},
-	import: function() {
-		$('textarea#blPortBox').die('click');
+        GM_addStyle("div#blUpdateMe { color: white; position: absolute; top: 0; right: 10px; font-size: 12px; z-index:100; cursor: pointer; }");
 
-		$.each(JSON.parse($('#blPortBox').val()),function() {
-			g.addToBlackList(this.toString());
-		});
-		
-		$('#blPortBox').val('');
 	},
-	saveBlacklist: function() {
-		// Saves g.blacklist to greasemonkey blacklist
-		GM_setValue('blacklist',g.blacklist.join(','));
-	},
-	addToBlackList: function(domain) {
-		// Adds an entry to the blacklist
-		g.blacklist.push(domain);
-		g.blacklist = g.blacklist.uniq().sort();
-		g.saveBlacklist();
-		// Show the results first, stop duplication errors.
-		g.showResults();
-		g.hideResults();
-		g.buildList();
-	},
-	removeFromBlackList: function() {
-		// Removes an entry from the blacklist
-		var domain = $(this).parent().find('span.domain').text();
-		g.blacklist = g.blacklist.remove(domain);
-		g.saveBlacklist();
-		// Show the results first, stop duplication errors.
-		g.showResults();
-		g.hideResults();
-		g.buildList();
-	},
-	manualAdd: function(ev) {
-		// manually add a domain to the blacklist
-		if ($('input#blAddBox').attr('value') == '') return;
-		
-		// I'm lazy, so I'm using the same function for keypress and a click
-		if(ev.keyCode != 13 && $(this).attr('id')== 'blAddBox') return;
 
-		g.addToBlackList($('input#blAddBox').attr('value'));
-		$('input#blAddBox').attr('value','');
-	},
-	blacklistThisDomain: function() {
-		// Blacklist this domain, show the confirmation
-		$(this).parents('li.g').find('div.cover').remove();
-
-		$(this).parents('li').append(
-			$('<div class="cover"><div class="blConfirm">Confirm:\u00a0<span class="blyes">Yes</span>\u00a0/\u00a0<span class="blno">No</span></div></div>').height($(this).parents('li').height()).width($(this).parents('li').width())
-		);
-	},
-	confirmation: function() {
-		// Shows confirmation for adding a domain to the list
-		if ($(this).hasClass('blyes')) {
-			var domain = $(this).parents('li.g').find('cite:first').text().replace(/^https:\/\//,'').replace(/[\/\s].+/,'').replace(/\/$/,'');
-						
-			if (g.prefs.blRegex===true) {
-				var tld = '';
-				var re;
-				$.each(g.tld,function() {
-					if (tld!='') return;
-					re = new RegExp('(.+)'+ this.replace(/\./g,'\\.') +'$','i');
-					if(re.test(domain)) {
-						tld = this.toString();
-					}
-				});
-				domain = '/([a-z0-9\\.]+)*'+ (domain.replace(re,'$1').split('.').pop()) + tld.replace(/\./g,'\\.') +'$/';
-			}
-						
-			domain = $.trim(domain);
-			g.addToBlackList(domain);
-		}
-
-		$(this).parents('div.cover').remove();
-	},
 	getBlacklist: function() {
 		// Gets the blacklist from greasemonkey
 		// Debug: for clearing out the blacklist
@@ -286,75 +418,23 @@ var g = {
 		// End debug
 		return (GM_getValue('blacklist') ? GM_getValue('blacklist').split(',') : [] );
 	},
-	hideResults: function() {
-		// Hide the results using the blacklist.
-		$('li.g').each(function() {
-			// Old results
-			if ($(this).is(":visible") === false) return;
-			
-			if ($(this).hasClass('psli') === true) return;
 
-
-			var cite = $(this).find('cite');
-			var domain = $(cite).text().replace(/^https:\/\//,'').split(' ')[0].split('/')[0];
-
-			// Malware check based on blMalware pref.
-			if (g.prefs.blMalware === true && /This site may harm your computer./.test($(this).parent().parent().find('a[onmousedown]').html()) === true) {
-				g.hideThis(cite,'malware');
-				return;
-			}
-
-			// News Display Check based on blNews pref
-			if (g.prefs.blNews === true && ($(this).parents('li.g').attr('id') === 'newsbox' || $(this).attr('id') === 'newsbox')) {
-				g.hideThis(cite,'news');
-				return;
-			}
-
-			var h = false;
-			$.each(g.blacklist,function(i,key) {
-				if (/^\/.+\/$/.test(key)) {
-					// Regular expression
-					var re = new RegExp(key.replace(/\//g,''),'i');
-					if (re.test(domain)) {
-						h = true;
-					}
-				} else if (key.toLowerCase() === domain.toLowerCase()) {
-					h = true;
-				}
-			});
-
-			// If hide is true hide this item.
-			if (h===true) {
-				g.hideThis(cite,domain);
-			}
-		});
-	},
-	hideThis: function(cite,domain) {
-		domain = domain || '';
-		if ($(cite).parents('li.g').prev().hasClass('hidtxt')) {
-			// Return if this domain is already blocked
-			return;
-		} else {
-			$(cite).parents('li.g').before(g.hiddenText.replace(/xxx/,domain));
-			$(cite).parents('li.g').hide();				
-		}
-
-	},
-	showResults: function() {
-		// Shows all results
-		$('li.hidtxt').remove();
-		$('li.g').show();
-	},
 	makeBlacklistControls: function() {
 		// Makes the controls for this script
 		
 		// Adds an option to show the blacklist into the greasemonkey menu
-		GM_registerMenuCommand("Toggle Google Blacklist",g.showHideBlacklist);
+		GM_registerMenuCommand("Toggle Google Blacklist",g.events.showHideBlacklist);
 		
 		$('body').append('<div id="blTop"><div class="blText">Your Blacklist<div id="blClose"></div></div><div id="blULContainer"><ul id="blacklist"></ul></div><div id="blForm"></div></div>');
+
+		$('div#blClose').on('click',g.events.showHideBlacklist);
 				
 		$('div#blForm').append('<input type="text" id="blAddBox" /><input type="button" value="add" id="blAddBtn" />');
 		$('div#blForm').append('<br/><span class="blDesc">Regular expressions are supported, do not use i or g flags.');
+
+		// Events
+		$('input#blAddBox').on('keyup',g.events.manualAdd);
+		$('input#blAddBtn').on('click',g.events.manualAdd);
 		
 		// Preferences
 		
@@ -367,6 +447,8 @@ var g = {
 		$('#blPrefList').append('<li id="blRegex">RegEx Blocker'+ prefTxt +'<br/><span class="blDesc">Use regex to block full domain name.</span></li>');
 		$('#blPrefList').append('<li id="blMalware">Auto Block Malware'+ prefTxt +'<br/><span class="blDesc">Auto-block sites listed as malware.</span></li>');
 		$('#blPrefList').append('<li id="blNews">Blacklist News'+ prefTxt +'<br/><span class="blDesc">Blacklists google news widget.</span></li>');
+		$('#blPrefList').append('<li id="blRelated">Blacklist Related'+ prefTxt +'<br/><span class="blDesc">Blacklists related results.</span></li>');
+		$('#blPrefList').append('<li id="blPrefShow">Show Preferences'+ prefTxt +'<br/><span class="blDesc">Leaves prefs open for debugging.</span></li>');
 				
 		$.each(g.prefs, function(id) {
 			if (this==false) {
@@ -374,7 +456,10 @@ var g = {
 				$('li#'+ id +' span.blPref').addClass('blOff');
 			}
 		});
-		
+
+		// Preference Toggle Events
+		$('span.blPref').on('click',g.events.togglePref);
+
 		// Import/Export
 		
 		$('#blTop').append('<div class="blText">Import/Export</div>');
@@ -382,17 +467,16 @@ var g = {
 		$('#blPortContainer').append('<button id="blImport">Import</button>&nbsp;<button id="blExport">Export</button>');
 		$('#blPortContainer').append('<br/>');
 		$('#blPortContainer').append('<textarea id="blPortBox"></textarea>');
-		
+
+		// Import/Export Events
+		$('button#blImport').on('click',g.events.import);
+		$('button#blExport').on('click',g.events.export);
+
 		$('div#blTop').hide();
 				
 		g.buildList();
 	},
-	urlUnFuck: function() {
-		$('a[onmousedown]').each(function(){
-			if (/return rwt/.test($(this).attr('onmousedown').toSource()) === false) return;
-			$(this).replaceWith($('<a href="'+ $(this).attr('href') +'">'+ $(this).html() +'</a>'));
-		});
-	},
+
 	buildList: function() {
 		$('li.domainEntry').remove();
 		
@@ -402,19 +486,16 @@ var g = {
 		} else {		
 			$.each(g.blacklist,function(i,key) {
 				$('ul#blacklist').append('<li class="domainEntry"><div class="ex"></div><span class="domain">'+ key +'</span></li>');
+				$('div.ex').on('click',g.events.removeFromBlackList);
 			});
 		}
 	},
-	serpMouseOver: function() {
-			if ($(this).find('.blLink').length > 0) return;
-			if ($(this).attr('id')) return;
-			if ($(this).siblings().height() > ($(this).height() * 3)) return;
-			if ($(this).find('.vspib').length > 0) return;
 
-			$(this).append('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>');
-	},
-	showHideBlacklist: function() {
-		$('div#blTop').toggle();
+	urlUnFuck: function() {
+		$('a[onmousedown]').each(function(){
+			if (/return rwt/.test($(this).attr('onmousedown').toSource()) === false) return;
+			$(this).replaceWith($('<a href="'+ $(this).attr('href') +'">'+ $(this).html() +'</a>'));
+		});
 	},
 
 	// Image from: http://www.webstuffshare.com/2010/03/stylize-your-own-checkboxes/
@@ -436,6 +517,10 @@ var g = {
 
 setTimeout(g.init,500);
 
+//var x = [1,2,3,3,3,3,3,4,9,1,2,3,4,5,5,5,5];
+//console.log($.unique(x).sort());
+
+
 Array.prototype.uniq = function() {
 	var old = this;
 	var uniq = [];
@@ -454,43 +539,6 @@ Array.prototype.remove = function(word) {
 	});
 	return out;
 };
-
-
-/*
-http://www.JSON.org/json2.js
-2011-02-23
-
-Public Domain.
-
-NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-See http://www.JSON.org/js.html
-*/
-var JSON;if(!JSON){JSON={};}
-(function(){"use strict";function f(n){return n<10?'0'+n:n;}
-if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(key){return isFinite(this.valueOf())?this.getUTCFullYear()+'-'+
-f(this.getUTCMonth()+1)+'-'+
-f(this.getUTCDate())+'T'+
-f(this.getUTCHours())+':'+
-f(this.getUTCMinutes())+':'+
-f(this.getUTCSeconds())+'Z':null;};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(key){return this.valueOf();};}
-var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},rep;function quote(string){escapable.lastIndex=0;return escapable.test(string)?'"'+string.replace(escapable,function(a){var c=meta[a];return typeof c==='string'?c:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);})+'"':'"'+string+'"';}
-function str(key,holder){var i,k,v,length,mind=gap,partial,value=holder[key];if(value&&typeof value==='object'&&typeof value.toJSON==='function'){value=value.toJSON(key);}
-if(typeof rep==='function'){value=rep.call(holder,key,value);}
-switch(typeof value){case'string':return quote(value);case'number':return isFinite(value)?String(value):'null';case'boolean':case'null':return String(value);case'object':if(!value){return'null';}
-gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==='[object Array]'){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||'null';}
-v=partial.length===0?'[]':gap?'[\n'+gap+partial.join(',\n'+gap)+'\n'+mind+']':'['+partial.join(',')+']';gap=mind;return v;}
-if(rep&&typeof rep==='object'){length=rep.length;for(i=0;i<length;i+=1){if(typeof rep[i]==='string'){k=rep[i];v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}else{for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+(gap?': ':':')+v);}}}}
-v=partial.length===0?'{}':gap?'{\n'+gap+partial.join(',\n'+gap)+'\n'+mind+'}':'{'+partial.join(',')+'}';gap=mind;return v;}}
-if(typeof JSON.stringify!=='function'){JSON.stringify=function(value,replacer,space){var i;gap='';indent='';if(typeof space==='number'){for(i=0;i<space;i+=1){indent+=' ';}}else if(typeof space==='string'){indent=space;}
-rep=replacer;if(replacer&&typeof replacer!=='function'&&(typeof replacer!=='object'||typeof replacer.length!=='number')){throw new Error('JSON.stringify');}
-return str('',{'':value});};}
-if(typeof JSON.parse!=='function'){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k,v,value=holder[key];if(value&&typeof value==='object'){for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v;}else{delete value[k];}}}}
-return reviver.call(holder,key,value);}
-text=String(text);cx.lastIndex=0;if(cx.test(text)){text=text.replace(cx,function(a){return'\\u'+
-('0000'+a.charCodeAt(0).toString(16)).slice(-4);});}
-if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+text+')');return typeof reviver==='function'?walk({'':j},''):j;}
-throw new SyntaxError('JSON.parse');};}}());
 
 /*
  * jQuery hashchange event - v1.3 - 7/21/2010
