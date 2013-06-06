@@ -15,12 +15,15 @@ My userscripts mostly migrated from userscripts.org
 
 ## Installation
 
-* Install GreaseMonkey - https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
+* For Firefox Install GreaseMonkey - https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
+* For Chrome Install Tampermonkey - https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en
+  * I'm not 100% sure these will all work on Tampermonkey, if you find a bug please report it.
 * Install the scripts with either of these:
   * Clone the repo and drag the .js files into your browser.
   * Click the script you want to install, click on "RAW", select INSTALL from the dialog box.
 
-## Google_Domain_Blocker.user.js
+## `Google_Domain_Blocker.user.js`
+
 Blocks junk domains from google.com SERP.
 
 Originally: https://userscripts.org/scripts/show/33156
@@ -29,9 +32,9 @@ How many times do you search Google and find junk results from search engine spa
 
 ### Files
 
-**Google_Domain_Blocker.importList.personal.json** - My personal blacklist, this list is pretty aggressive and probably shouldn't be used by most users.
+**`Google_Domain_Blocker.importList.personal.json`** - My personal blacklist, this list is pretty aggressive and probably shouldn't be used by most users.
 
-**Google_Domain_Blocker.importList.sample.json** - Example blacklist blocking amazon, facebook, w3cschools, and yelp.
+**`Google_Domain_Blocker.importList.sample.json`** - Example blacklist blocking amazon, facebook, w3cschools, and yelp.
 
 ### Features
 
@@ -57,11 +60,19 @@ I tried to make blacklisting of domains as straight forward as possible.  Move y
 
 #### Your Blacklist
 
+**Firefox**
+
 You may view the blacklist preferences through the menu or the greasemonkey icon.  Selecting either of these brings up "Your Blacklist".
 
 ![GreaseMonkey Menu Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-menu_user_script_command.png)
 
 ![GreaseMonkey User Script Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-gm_icon_user_script_command.png)
+
+**Chrome**
+
+You may view thte blacklist preferences through the Tampermonkey icon.
+
+![Tampermonkey User Script Command](http://jobson.us/github/pjUserscripts/screen_shots/gdb-tm_icon_command.png)
 
 **Your Blacklist Empty and Populated**
 
@@ -90,14 +101,14 @@ Allows you to import or export your full blacklist in JSON format.
 
 ![Import/Export](http://jobson.us/github/pjUserscripts/screen_shots/gdb-import_export.png)
 
-## Gun_Shop_OOS_Hider.user.js
+## `Gun_Shop_OOS_Hider.user.js`
 
 This is a work in progress to modifiy the results from various gun shops. 
 
-## TheTVDB_Hide_Non-English.user.js
+## `TheTVDB_Hide_Non-English.user.js`
 
 Simply hides non-English results from TheTVDB's result list.
 
-## Craigslist_Image_Viewer.user.js
+## `Craigslist_Image_Viewer.user.js`
 
 Automatically shows all images in search results in Craigslist, I like using this more than the default functionality that CL offers.
