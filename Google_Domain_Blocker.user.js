@@ -4,7 +4,7 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    https://github.com/pjobson/pjUserscripts/raw/master/Google_Domain_Blocker.user.js
-// @version        2013.06.06
+// @version        2013.06.24
 // @include        *://*.google.*/*
 // @exclude        *tbm=shop*
 // @exclude        *://plus.*
@@ -179,6 +179,10 @@ var g = {
 			if ($(this).hasClass('obcontainer')) return;
 
 			$(this).append($('<div class="rotated"><span class="blLink">Blacklist\u00a0Domain</span></div>').on('click',g.events.blacklistThisDomain));
+		},
+
+		serpMouseLeave: function() {
+			$(this).find('div.rotated').remove();
 		},
 
 		showHideBlacklist: function() {
@@ -358,6 +362,7 @@ var g = {
 
 		// SERP item mouse over
 		$('div#res ol#rso li.g').on('mouseenter',g.events.serpMouseOver);
+		$('div#res ol#rso li.g').on('mouseleave',g.events.serpMouseLeave);
 	},
 	
 	addStyles: function() {
@@ -400,8 +405,8 @@ var g = {
 		
 		GM_addStyle("div#blUpdated { margin: 3px; text-align: center; }");
 
-		GM_addStyle("li.g { position: relative; }");
-		GM_addStyle("div.rotated { -moz-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); position: absolute; top: 30px; left: -50px; }");
+		GM_addStyle("li.g { position: relative; background-color: transparent; }");
+		GM_addStyle("div.rotated { background-color: transparent; -moz-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); position: absolute; top: 30px; left: -46px; padding-bottom: 5px; padding-top: 5px; }");
 		GM_addStyle("div.cover { background-color: transparent; top: 0; left: 0; position: absolute; text-align: center; background-image: url("+ g.transPNG +"); background-repeat: repeat-x repeat-y;  }");
 		GM_addStyle("div.cover div.blConfirm { text-align: left; color: white; background-color: transparent; padding: 10px; font-weight: bold; }");
         GM_addStyle("div.blConfirm span.blyes { color: #0E774A; cursor: pointer; }");
