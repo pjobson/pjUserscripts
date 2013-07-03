@@ -6,8 +6,6 @@ My userscripts mostly migrated from userscripts.org
   * Installation instruction for scripts.
 * <a href="#google_domain_blockeruserjs">Google Domain Blocker</a>
   * Blacklisting of domains in google, helps filter garbage results.
-* <a href="#gun_shop_oos_hideruserjs">Gun Shop Out of Stock Hider</a>
-  * Hides out of stock items for gun shops.
 * <a href="#thetvdb_hide_non-englishuserjs">TheTVDB Hide Non-English</a>
   * Hides non-English results on TheTVDB.
 * <a href="#craigslist_image_vieweruserjs">Craigslist Image Viwer</a>
@@ -101,9 +99,6 @@ Allows you to import or export your full blacklist in JSON format.
 
 ![Import/Export](http://jobson.us/github/pjUserscripts/screen_shots/gdb-import_export.png)
 
-## `Gun_Shop_OOS_Hider.user.js`
-
-This is a work in progress to modifiy the results from various gun shops. 
 
 ## `TheTVDB_Hide_Non-English.user.js`
 
