@@ -4,10 +4,11 @@
 // @description    Blocks irrelevant and spam domains.
 // @license        http://creativecommons.org/licenses/by-nc-sa/3.0/
 // @downloadURL    https://github.com/pjobson/pjUserscripts/raw/master/Google_Domain_Blocker.user.js
-// @version        2013.06.24
+// @version        2013.09.08
 // @include        *://*.google.*/*
 // @exclude        *tbm=shop*
 // @exclude        *://plus.*
+// @exclude        *://mail.*
 // @require        http://code.jquery.com/jquery-latest.min.js
 // @grant          GM_addStyle
 // @grant          GM_deleteValue
@@ -127,6 +128,10 @@ var g = {
 			if (g.prefs.blRelated) {
 				$('div#extrares').replaceWith(g.hiddenText.replace(/xxx/,'related'))
 			}
+			// Hide ads
+			$('#taw').remove();
+			$('#bottomads').remove();
+			$('.ads-container').remove();
 			// Hide the results using the blacklist.
 			$('li.g').each(function() {
 				// Old results
