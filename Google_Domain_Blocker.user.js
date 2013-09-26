@@ -129,7 +129,7 @@ var g = {
 				$('div#extrares').replaceWith(g.hiddenText.replace(/xxx/,'related'))
 			}
 			// Hide ads
-			$('#taw').remove();
+			$('#tvcap').remove();
 			$('#bottomads').remove();
 			$('.ads-container').remove();
 			// Hide the results using the blacklist.
